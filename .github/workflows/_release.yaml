@@ -1,5 +1,5 @@
 ---
-name: Manual - Semantic Release
+name: Manual - Release
 
 on:
   workflow_dispatch:
