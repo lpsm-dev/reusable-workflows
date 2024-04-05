@@ -1,0 +1,57 @@
+---
+name: Common - Check Actions + Workflows
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/**, actions/**]
+  pull_request:
+    branches: [main]
+    paths: [.github/workflows/**, actions/**]
+    types: [opened, synchronize]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  action-lint:
+    name: Action Lint
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    - uses: devops-actions/actionlint@v0.1.2
+      id: action-lint
+      continue-on-error: true
+    - uses: actions/upload-artifact@v4
+      with:
+        name: actionlint-results
+        path: ${{ steps.action-lint.outputs.results-file }}
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    - name: Run YAML Lint in PR
+      uses: reviewdog/action-yamllint@v1
+      if: ${{ github.event_name == 'pull_request' && !contains(github.ref, 'renovate') }}
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        reporter: github-check
+        yamllint_flags: "-c .github/config/.yamllint.yaml ."
+    - name: Run YAML Lint in Branch
+      uses: reviewdog/action-yamllint@v1
+      if: ${{ github.event_name != 'pull_request' && !contains(github.ref, 'renovate') }}
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        reporter: github-check
+        yamllint_flags: "-c .github/config/.yamllint.yaml ."

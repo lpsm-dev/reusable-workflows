@@ -1,0 +1,36 @@
+---
+version: "3"
+
+vars:
+  DIR_GITHUB_CUSTOM_ACTIONS: "{{ .ROOT_DIR }}/actions"
+  DIR_GITHUB_WORKFLOWS: "{{ .ROOT_DIR }}/.github/workflows"
+
+tasks:
+  action:docs:
+    desc: Creating Custom Actions and Reusable Workflows README.md docs
+    preconditions:
+    - sh: which action-docs
+      msg: kind {{ .PATH_ERROR }}
+    cmds:
+    - |
+      custom_action_dir={{ .DIR_GITHUB_CUSTOM_ACTIONS }}
+      find $custom_action_dir -type f -name "action.yaml" -exec dirname {} \; | uniq | while read -r dir; do
+        echo "Running action-docs int $dir" && (cd "$dir" && action-docs --source=action.yaml --no-banner --line-breaks=LF > README.md)
+      done
+
+      reusable_workflows_dir={{ .DIR_GITHUB_WORKFLOWS }}
+      mkdir -p "$reusable_workflows_dir/docs"
+      reusable_workflows_dir_docs="$reusable_workflows_dir/docs"
+      find "$reusable_workflows_dir" -type f -name "reusable-*.yaml" | while read -r file; do
+        echo "Running action-docs in $file"
+        action-docs --source="$file" --no-banner --line-breaks=LF > "${file%.*}.md"
+        mv "${file%.*}.md" "$reusable_workflows_dir_docs"
+      done
+
+  action:lint:
+    desc: Linting Custom Actions and Reusable Workflows
+    preconditions:
+    - sh: which actionlint
+      msg: kind {{ .PATH_ERROR }}
+    cmds:
+    - actionlint

@@ -1,0 +1,23 @@
+---
+name: AWS ECR Create
+description: Action to create an ECR if doesn't exist
+
+inputs:
+  aws-region:
+    description: The region in AWS that we will be working in
+    default: us-east-1
+    required: false
+  repository-name:
+    description: The name of the repository that is to be created in ECR
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: Check to see if the ECR repo exists
+    shell: bash
+    run: |
+      if ! aws ecr describe-repositories --region ${{ inputs.aws-region }} --repository-names ${{ inputs.repository-name }} &>/dev/null; then
+        echo "The ECR repository ${{ inputs.repository-name }} was not found. Creating...."
+        aws ecr create-repository --region ${{ inputs.aws-region }} --repository-name ${{ inputs.repository-name }}
+      fi
