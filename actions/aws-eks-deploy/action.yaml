@@ -1,0 +1,67 @@
+---
+name: AWS EKS Deploy
+description: Action to update a Kubernetes deployment image in AWS EKS using Kubectl
+
+inputs:
+  aws-role-arn:
+    description: The AWS Role to assume and execute actions in the pipeline that interact with AWS services
+    required: true
+  aws-region:
+    description: The region in AWS that we will be working in
+    required: false
+    default: us-east-1
+  aws-session-name:
+    description: The AWS session name to use when assuming the AWS Role
+    default: github-action-kubectl
+    required: false
+  eks-cluster-name:
+    description: The name of the EKS cluster that is used to call kubeconfig with awscli
+    required: true
+    default: eks-develop-services
+  eks-namespace:
+    description: The Kubernetes namespace of the application that is going to be deployed
+    required: true
+    default: default
+  app-name:
+    description: The application name that is going to be deployed
+    required: true
+  image-name:
+    description: The name of the application image that is going to be deployed
+    required: true
+  image-tag:
+    description: The tag of the application image that is going to be deployed
+    required: true
+    default: latest
+  kubectl-version:
+    description: The kubectl version to install
+    required: false
+    default: v1.29.1
+
+runs:
+  using: composite
+  steps:
+  - name: Install Kubectl
+    uses: azure/setup-kubectl@v3
+    with:
+      version: ${{ inputs.kubectl-version }}
+  - name: Assume AWS IAM Role
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      aws-region: ${{ inputs.aws-region }}
+      role-to-assume: ${{ inputs.aws-role-arn }}
+      role-session-name: ${{ inputs.aws-session-name }}
+      mask-aws-account-id: false
+  - name: Login to Amazon ECR
+    uses: aws-actions/amazon-ecr-login@v2
+    id: login-ecr
+    with:
+      mask-password: true
+  - name: Get AWS EKS kubeconfig
+    shell: bash
+    run: aws eks update-kubeconfig --name ${{ inputs.eks-cluster-name }} --region ${{ inputs.aws-region }}
+  - name: Update image tag of Kubernetes deployment
+    shell: bash
+    env:
+      IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
+    run: |
+      kubectl set image deployment/${{ inputs.app-name }} ${{ inputs.app-name }}=$IMAGE -n ${{ inputs.eks-namespace }}
