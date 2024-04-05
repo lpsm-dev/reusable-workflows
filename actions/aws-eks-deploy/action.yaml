@@ -41,7 +41,7 @@ runs:
   using: composite
   steps:
   - name: Install Kubectl
-    uses: azure/setup-kubectl@v3
+    uses: azure/setup-kubectl@v4
     with:
       version: ${{ inputs.kubectl-version }}
   - name: Assume AWS IAM Role
