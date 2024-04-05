@@ -3,7 +3,7 @@
 
 <a name="readme-top"></a>
 
-<img alt="gif-about" src=".github/assets/git-about.gif" width="225"/>
+<img alt="gif-about" src="https://github.com/lpsm-dev/lpsm-dev/blob/0062b174ec9877e6dfc78817f314b4a0690f63ff/.github/assets/github.gif" width="225"/>
 
 <h2>Reusable Workflows</h2>
 
@@ -51,7 +51,7 @@ If you have any problems, please contact **DevOps Team**.
 
 Give this project a ⭐️ if it helped you!
 
-<img alt="gif-footer" src=".github/assets/gif-footer.gif" width="225"/>
+<img alt="gif-footer" src="https://github.com/lpsm-dev/lpsm-dev/blob/0062b174ec9877e6dfc78817f314b4a0690f63ff/.github/assets/yoda.gif" width="225"/>
 
 <br>
 <br>
