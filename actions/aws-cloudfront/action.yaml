@@ -1,0 +1,55 @@
+---
+name: Deploy to Cloudfront
+description: Action to upload files to S3 and create a Cloudfront cache invalidation
+
+inputs:
+  aws-role-arn:
+    description: The AWS Role to assume and execute actions in the pipeline that interact with AWS services
+    required: true
+  aws-region:
+    description: The region in AWS that we will be working in
+    required: false
+    default: us-east-1
+  aws-session-name:
+    description: The AWS session name to use when assuming the AWS Role
+    default: github-action-cloudfront
+    required: false
+  path:
+    description: Path to be copied to AWS S3
+    required: false
+    default: .
+  s3-bucket-name:
+    description: Name of AWS S3 bucket
+    required: true
+  s3-bucket-domain:
+    description: Domain of AWS S3 bucket
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: Assume AWS IAM Role
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      aws-region: ${{ inputs.aws-region }}
+      role-to-assume: ${{ inputs.aws-role-arn }}
+      role-session-name: ${{ inputs.aws-session-name }}
+      mask-aws-account-id: false
+  - name: Sync to AWS S3
+    shell: bash
+    run: |
+      ls -al
+      aws s3 sync ${{ inputs.path }} s3://${{ inputs.s3-bucket-name }}
+  - name: Create invalidation cache in AWS CloudFront
+    shell: bash
+    run: |
+      #!/usr/bin/env bash
+      set -eou pipefail
+      AWS_CLOUDFRONT_DISTRIBUTION_ID=`aws cloudfront list-distributions --query "DistributionList.Items[].{Id: Id, OriginDomainName: Origins.Items[0].DomainName}[?contains(OriginDomainName, '${{ inputs.s3-bucket-name }}.${{ inputs.s3-bucket-domain }}')] | [0]" | jq -r '.Id'`
+      echo "AWS Cloudfront distribution ID: $AWS_CLOUDFRONT_DISTRIBUTION_ID"
+      AWS_CLOUDFRONT_INVALIDATION_ID=`aws cloudfront create-invalidation --distribution-id=$AWS_CLOUDFRONT_DISTRIBUTION_ID --paths "/*" | jq -r .Invalidation.Id`
+      echo "AWS Cloudfront invalidation ID: $AWS_CLOUDFRONT_INVALIDATION_ID"
+      echo "Waiting for cache invalidation to complete"
+      aws cloudfront wait invalidation-completed --distribution-id $AWS_CLOUDFRONT_DISTRIBUTION_ID --id $AWS_CLOUDFRONT_INVALIDATION_ID
+      echo "Get invalidation"
+      aws cloudfront get-invalidation --distribution-id $AWS_CLOUDFRONT_DISTRIBUTION_ID --id $AWS_CLOUDFRONT_INVALIDATION_ID
