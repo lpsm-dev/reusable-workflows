@@ -33,7 +33,7 @@ Links relevantes para essa documentação:
 - [GitHub Reusable Workflows](https://docs.github.com/en/actions/using-workflows/reusing-workflows)
 - [GitHub Custom Actions](https://docs.github.com/en/actions/creating-actions/about-custom-actions)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 # Contribuição
 
