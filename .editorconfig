@@ -17,3 +17,8 @@ indent_style = space
 insert_final_newline = true
 # No whitespace at the end of line
 trim_trailing_whitespace = true
+
+# JSON files
+[*.json]
+# Each indent should contain 4 spaces for Python files
+indent_size = 2

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/jetpack-io/devbox/0.10.3/.schema/devbox.schema.json",
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.13.7/.schema/devbox.schema.json",
   "packages": [
     "act@latest",
     "actionlint@latest",
@@ -7,5 +7,11 @@
     "go-task@latest",
     "pre-commit@latest",
     "yamllint@latest"
-  ]
+  ],
+  "shell": {
+    "init_hook": ["echo 'Welcome to devbox!' > /dev/null"],
+    "scripts": {
+      "test": ["echo \"Error: no test specified\" && exit 1"]
+    }
+  }
 }
