@@ -22,7 +22,7 @@ permissions:
 jobs:
   action-lint:
     name: Action Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
     - name: Checkout Code
@@ -36,7 +36,7 @@ jobs:
         path: ${{ steps.action-lint.outputs.results-file }}
   yaml-lint:
     name: YAML Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
     - name: Checkout Code
