@@ -3,7 +3,7 @@
   "packages": [
     "act@latest",
     "actionlint@latest",
-    "gitleaks@latest",
+    "gitleaks@7.6.1",
     "go-task@latest",
     "pre-commit@latest",
     "yamllint@latest"
