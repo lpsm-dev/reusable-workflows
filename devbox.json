@@ -3,7 +3,7 @@
   "packages": [
     "act@0.2.74",
     "actionlint@1.7.7",
-    "gitleaks@7.6.1",
+    "gitleaks@8.24.0",
     "go-task@3.41.0",
     "pre-commit@4.0.1",
     "yamllint@1.35.1"
