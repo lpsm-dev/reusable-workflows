@@ -12,7 +12,7 @@
 
 - [Sumário](#sumário)
 - [Concepts](#concepts)
-- [➤ Templates ](#-templates-)
+- [Actions](#actions)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -30,18 +30,13 @@ In this project we are using the idea of Composite actions.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# ➤ Templates <a name="#-templates"></a>
+# Actions
 
-| Name                                | Description                                                                                         |
-|-------------------------------------|-----------------------------------------------------------------------------------------------------|
-| [aws-cloudfront](./actions/aws-cloudfront/README.md)   | Action to upload files to S3 and create a Cloudfront cache invalidation                               |
-| [aws-ecr-build-push](./actions/aws-ecr-build-push/README.md) | Action to build and push a container image to AWS ECR                                              |
-| [aws-ecr-create](./actions/aws-ecr-create/README.md)     | Action to create an ECR if it doesn't exist                                                         |
-| [aws-eks-deploy](./actions/aws-eks-deploy/README.md)     | Action to update a Kubernetes deployment image in AWS EKS using Kubectl                              |
-| [npm-build](./actions/npm-build/README.md)               | Action to build an NPM project                                                                      |
-| [npm-install](./actions/npm-install/README.md)           | Action to run the NPM install command                                                               |
-| [npm-load-cache](./actions/npm-load-cache/README.md)     | Action to load NPM cache from previous builds                                                       |
-| [npm-run](./actions/npm-run/README.md)                   | Action to run a generic NPM command                                                                 |
+| Name | Path | Description |
+| --- | --- | --- |
+| aws-cloudfront-deploy | [`actions/aws-cloudfront-deploy/action.yaml`](./aws-cloudfront-deploy/action.yaml) | Action to upload files to S3 and create a Cloudfront cache invalidation |
+| aws-ecr-create | [`actions/aws-ecr-create/action.yaml`](./aws-ecr-create/action.yaml) | Action to create an ECR if it doesn't exist |
+| aws-eks-deploy | [`actions/aws-eks-deploy/action.yaml`](./aws-eks-deploy/action.yaml) | Action to update a Kubernetes deployment image in AWS EKS using Kubectl |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
