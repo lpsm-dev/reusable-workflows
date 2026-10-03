@@ -1,0 +1,19 @@
+---
+name: CI
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    uses: ./.github/workflows/gitleaks.yaml
+    with:
+      config: .github/config/.gitleaks.toml
