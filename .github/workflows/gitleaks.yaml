@@ -1,0 +1,56 @@
+---
+# OWASP CI/CD Top 10: workflow_call only, read-only token
+# (persist-credentials: false), pinned checksum, no pull_request_target,
+# contents: read, --redact, timeout, official release only, no artifact upload,
+# failure is the log.
+name: Gitleaks
+
+on:
+  workflow_call:
+    inputs:
+      config:
+        description: Path to the Gitleaks config, relative to the caller repository
+        required: false
+        type: string
+        default: .github/config/.gitleaks.toml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gitleaks-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+    - name: Checkout
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      with:
+        persist-credentials: false
+        fetch-depth: 0
+    - name: Install Gitleaks
+      run: |
+        set -euo pipefail
+        version="8.23.3"
+        archive="gitleaks_${version}_linux_x64.tar.gz"
+        url="https://github.com/gitleaks/gitleaks/releases/download/v${version}/${archive}"
+        checksum="73a35edc2285afd689e712b8e0ebad3f2eaf94b0d67cd6e1f0ec693ac751bb4a"
+        work="$(mktemp -d)"
+        curl -fsSL -o "${work}/${archive}" "$url"
+        printf '%s  %s\n' "$checksum" "$archive" | (cd "$work" && sha256sum -c)
+        tar -xzf "${work}/${archive}" -C "$work" gitleaks
+        sudo install -m 0755 "${work}/gitleaks" /usr/local/bin/gitleaks
+        rm -rf "$work"
+        gitleaks version
+    - name: Scan
+      env:
+        GITLEAKS_CONFIG: ${{ inputs.config }}
+      run: |
+        set -euo pipefail
+        export root="$(mktemp -d)"
+        trap 'rm -rf "$root"' EXIT
+        git archive --format=tar HEAD | tar -x -C "$root"
+        gitleaks detect --no-git --source "$root" --redact --no-banner --config "${GITHUB_WORKSPACE}/${GITLEAKS_CONFIG}"

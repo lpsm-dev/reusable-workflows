@@ -18,11 +18,59 @@ Centralized custom actions and reusable-workflows in GitHub
 # Sumário
 
 - [Sumário](#sumário)
+- [Gitleaks](#gitleaks)
 - [Referências](#referências)
 - [Contribuição](#contribuição)
 - [Versionamento](#versionamento)
 - [Troubleshooting](#troubleshooting)
 - [Show your support](#show-your-support)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+# Gitleaks
+
+`.github/workflows/gitleaks.yaml` responde só a `workflow_call`. A config fica no repositório que chama. O input `config` é o caminho do TOML, relativo à raiz desse repositório. O padrão é `.github/config/.gitleaks.toml`.
+
+As pastas em `actions/` são composite actions (`action.yaml`). O Gitleaks daqui é um reusable workflow.
+
+## Como chamar
+
+No workflow do projeto, pina o commit completo deste repositório:
+
+```yaml
+name: Gitleaks
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    uses: lpsm-dev/reusable-workflows/.github/workflows/gitleaks.yaml@<sha-completo>
+    with:
+      config: .github/config/.gitleaks.toml
+```
+
+O CI deste repositório chama o mesmo arquivo por caminho relativo, sem `@ref`:
+
+```yaml
+jobs:
+  scan:
+    uses: ./.github/workflows/gitleaks.yaml
+```
+
+## Por que pinar o SHA completo
+
+Tag e branch mudam de commit. O código executado no caller muda junto, com o `GITHUB_TOKEN` daquele repositório. Um SHA de 40 caracteres identifica um commit e permanece nesse commit. Versão nova: o projeto troca o SHA num commit próprio.
+
+## O que fica de fora
+
+Release continua no repositório de cada projeto. Este workflow não declara `secrets` e não recebe credencial de deploy. Também não usa `pull_request_target`.
+
+O job faz checkout com `persist-credentials: false`, instala o Gitleaks 8.23.3, confere o SHA256 `73a35edc2285afd689e712b8e0ebad3f2eaf94b0d67cd6e1f0ec693ac751bb4a` e escaneia `git archive HEAD` com `--redact`. A falha aparece no log. Não há upload de relatório.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
