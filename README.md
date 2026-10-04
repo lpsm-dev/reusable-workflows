@@ -33,6 +33,8 @@ Centralized custom actions and reusable-workflows in GitHub
 
 As pastas em `actions/` são composite actions (`action.yaml`). O Gitleaks daqui é um reusable workflow.
 
+Workflows chamáveis ficam como arquivos soltos em `.github/workflows/`. Actions ficam em `actions/`. `templates/` não é runtime.
+
 ## Como chamar
 
 No workflow do projeto, pina o commit completo deste repositório:
