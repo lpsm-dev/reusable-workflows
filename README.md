@@ -19,6 +19,7 @@ Centralized custom actions and reusable-workflows in GitHub
 
 - [Sumário](#sumário)
 - [Gitleaks](#gitleaks)
+- [Superfícies e templates](docs/README.md)
 - [Referências](#referências)
 - [Contribuição](#contribuição)
 - [Versionamento](#versionamento)
@@ -33,7 +34,7 @@ Centralized custom actions and reusable-workflows in GitHub
 
 As pastas em `actions/` são composite actions (`action.yaml`). O Gitleaks daqui é um reusable workflow.
 
-Workflows chamáveis ficam como arquivos soltos em `.github/workflows/`. Actions ficam em `actions/`. `templates/` não é runtime.
+Workflows chamáveis ficam como arquivos soltos em `.github/workflows/`. Actions ficam em `actions/`. `templates/` é a cópia única, fora do `uses:`. O guia está em [docs/README.md](docs/README.md).
 
 ## Como chamar
 
