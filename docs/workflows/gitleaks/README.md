@@ -57,7 +57,7 @@ jobs:
     uses: lpsm-dev/reusable-workflows/.github/workflows/gitleaks.yaml@<sha-completo>
 ```
 
-Troque `<sha-completo>` pelo SHA de 40 caracteres de um commit deste repositório. O motivo está em [Fixando a versão pelo SHA](../../../README.md#34-fixando-a-versão-pelo-sha).
+Troque `<sha-completo>` pelo SHA de 40 caracteres de um commit deste repositório. O motivo está em [Fixando a versão pelo SHA](../../../README.md#44-fixando-a-versão-pelo-sha).
 
 ## 2.2. Entradas
 
@@ -127,13 +127,15 @@ Se o Gitleaks encontrar algo, o job falha e o achado aparece no log, com o valor
 
 # 5. Segurança
 
-O desenho segue o [OWASP Top 10 CI/CD Security Risks](https://owasp.org/projects/top-10-cicd-security-risks):
+O desenho segue o [OWASP Top 10 CI/CD Security Risks](https://owasp.org/projects/top-10-cicd-security-risks). A visão geral do repositório está na seção [Segurança](../../../README.md#2-segurança) do README.
 
-- O token tem só `contents: read`.
-- O gatilho é só `workflow_call`. Não existe `pull_request_target`, então código de fork não roda com as permissões do repositório base.
-- Nenhum secret é declarado e nenhuma credencial de deploy passa pelo workflow.
-- O `actions/checkout` está fixado por SHA, e o binário do Gitleaks é validado por SHA256.
-- `concurrency` cancela a execução anterior do mesmo ref.
+- **CICD-SEC-2 e CICD-SEC-6:** nenhum secret é declarado, nenhuma credencial de deploy passa pelo workflow, o checkout usa `persist-credentials: false` e o scan roda com `--redact`.
+- **CICD-SEC-3 e CICD-SEC-9:** o `actions/checkout` está fixado por SHA, e o binário do Gitleaks só é instalado se o SHA256 bater.
+- **CICD-SEC-4:** o gatilho é só `workflow_call`, sem `pull_request_target`, e o input `config` chega ao script por `env:`.
+- **CICD-SEC-5:** o token tem só `contents: read`.
+- **CICD-SEC-7:** o job roda em runner hospedado pelo GitHub, com timeout de 10 minutos, e `concurrency` cancela a execução anterior do mesmo ref.
+- **CICD-SEC-8:** nada sai do runner: não há upload de relatório nem integração externa.
+- **CICD-SEC-10:** a falha derruba o job e aparece no log, junto com a config que foi usada.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

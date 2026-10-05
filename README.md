@@ -22,19 +22,23 @@ Hello Human 👽! Bem-vindo ao meu repositório 👋
 &nbsp;&nbsp;&nbsp;[1.1. Objetivo](#11-objetivo)<br>
 &nbsp;&nbsp;&nbsp;[1.2. Estrutura do repositório](#12-estrutura-do-repositório)<br>
 &nbsp;&nbsp;&nbsp;[1.3. Workflow ou action?](#13-workflow-ou-action)<br>
-[2. Catálogo](#2-catálogo)<br>
-&nbsp;&nbsp;&nbsp;[2.1. Reusable workflows](#21-reusable-workflows)<br>
-&nbsp;&nbsp;&nbsp;[2.2. Composite actions](#22-composite-actions)<br>
-[3. Implementação](#3-implementação)<br>
-&nbsp;&nbsp;&nbsp;[3.1. Pré-requisitos](#31-pré-requisitos)<br>
-&nbsp;&nbsp;&nbsp;[3.2. Chamando um reusable workflow](#32-chamando-um-reusable-workflow)<br>
-&nbsp;&nbsp;&nbsp;[3.3. Usando uma composite action](#33-usando-uma-composite-action)<br>
-&nbsp;&nbsp;&nbsp;[3.4. Fixando a versão pelo SHA](#34-fixando-a-versão-pelo-sha)<br>
-[4. Referências](#4-referências)<br>
-[5. Contribuição](#5-contribuição)<br>
-[6. Versionamento](#6-versionamento)<br>
-[7. Troubleshooting](#7-troubleshooting)<br>
-[8. Show your support](#8-show-your-support)<br>
+[2. Segurança](#2-segurança)<br>
+&nbsp;&nbsp;&nbsp;[2.1. Como cada risco é tratado](#21-como-cada-risco-é-tratado)<br>
+&nbsp;&nbsp;&nbsp;[2.2. Pendências conhecidas](#22-pendências-conhecidas)<br>
+&nbsp;&nbsp;&nbsp;[2.3. No seu pipeline](#23-no-seu-pipeline)<br>
+[3. Catálogo](#3-catálogo)<br>
+&nbsp;&nbsp;&nbsp;[3.1. Reusable workflows](#31-reusable-workflows)<br>
+&nbsp;&nbsp;&nbsp;[3.2. Composite actions](#32-composite-actions)<br>
+[4. Implementação](#4-implementação)<br>
+&nbsp;&nbsp;&nbsp;[4.1. Pré-requisitos](#41-pré-requisitos)<br>
+&nbsp;&nbsp;&nbsp;[4.2. Chamando um reusable workflow](#42-chamando-um-reusable-workflow)<br>
+&nbsp;&nbsp;&nbsp;[4.3. Usando uma composite action](#43-usando-uma-composite-action)<br>
+&nbsp;&nbsp;&nbsp;[4.4. Fixando a versão pelo SHA](#44-fixando-a-versão-pelo-sha)<br>
+[5. Referências](#5-referências)<br>
+[6. Contribuição](#6-contribuição)<br>
+[7. Versionamento](#7-versionamento)<br>
+[8. Troubleshooting](#8-troubleshooting)<br>
+[9. Show your support](#9-show-your-support)<br>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -45,6 +49,8 @@ Hello Human 👽! Bem-vindo ao meu repositório 👋
 ## 1.1. Objetivo
 
 Este repositório concentra as peças de GitHub Actions que se repetem entre os meus projetos. Em vez de copiar o mesmo YAML para cada repositório, o projeto chama a peça daqui, fixada em um commit, e só recebe mudanças quando decide atualizar esse commit.
+
+Toda peça daqui segue o [OWASP Top 10 CI/CD Security Risks](https://owasp.org/projects/top-10-cicd-security-risks). A seção [Segurança](#2-segurança) mostra como cada risco é tratado e o que ainda falta.
 
 ## 1.2. Estrutura do repositório
 
@@ -87,15 +93,57 @@ E os arquivos de configuração? Cada projeto mantém os seus, como o `.github/c
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# 2. Catálogo
+# 2. Segurança
 
-## 2.1. Reusable workflows
+Um workflow compartilhado roda no pipeline de todo repositório que o chama, com acesso a código, tokens e, às vezes, à nuvem. Uma falha aqui se espalha para todos eles. Por isso cada peça deste repositório parte do [OWASP Top 10 CI/CD Security Risks](https://owasp.org/projects/top-10-cicd-security-risks), e os mesmos princípios valem para o pipeline de quem consome.
+
+## 2.1. Como cada risco é tratado
+
+| Risco | Como este repositório aplica |
+| --- | --- |
+| [CICD-SEC-1: Insufficient Flow Control Mechanisms](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-01-Insufficient-Flow-Control-Mechanisms) | Mudanças entram na `main` por pull request com squash. Quem chama fixa um SHA, então nada daqui chega a outro pipeline sem um pull request lá trocando o SHA. O release só roda na `main`, por disparo manual. |
+| [CICD-SEC-2: Inadequate Identity and Access Management](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-02-Inadequate-Identity-And-Access-Management) | Os reusable workflows não recebem credenciais. O `aws-cloudfront-deploy` e o `aws-eks-deploy` assumem uma role via OIDC, com credencial temporária, em vez de usar chave de acesso fixa. |
+| [CICD-SEC-3: Dependency Chain Abuse](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-03-Dependency-Chain-Abuse) | Actions de terceiros são fixadas pelo SHA completo, e quem chama fixa este repositório da mesma forma, como explica [Fixando a versão pelo SHA](#44-fixando-a-versão-pelo-sha). |
+| [CICD-SEC-4: Poisoned Pipeline Execution](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-04-Poisoned-Pipeline-Execution) | Nenhum workflow usa `pull_request_target`, e os reusable workflows só respondem a `workflow_call`. Inputs entram nos scripts por `env:`, e não por `${{ }}` dentro do `run:`. |
+| [CICD-SEC-5: Insufficient PBAC](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-05-Insufficient-PBAC) | Todo workflow declara `permissions`. Os reusable workflows públicos só leem o repositório, e escrita aparece só nos internos que precisam dela: o release e o lint. |
+| [CICD-SEC-6: Insufficient Credential Hygiene](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-06-Insufficient-Credential-Hygiene) | O checkout usa `persist-credentials: false` quando o job não faz push, o Gitleaks mascara o segredo com `--redact`, e todo push e pull request deste repositório passa pelo scan de segredos. |
+| [CICD-SEC-7: Insecure System Configuration](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-07-Insecure-System-Configuration) | Os jobs rodam em runners hospedados pelo GitHub, descartados ao fim de cada execução, com `timeout-minutes`. |
+| [CICD-SEC-8: Ungoverned Usage of 3rd Party Services](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-08-Ungoverned-Usage-of-3rd-Party-Services) | Os workflows não mandam código nem token para serviços externos: o Gitleaks roda no runner e o resultado fica no log. Apps instalados no repositório, como o CodeRabbit, têm acesso por fora do pipeline e precisam ser revisados nas configurações do repositório, em GitHub Apps. |
+| [CICD-SEC-9: Improper Artifact Integrity Validation](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-09-Improper-Artifact-Integrity-Validation) | O binário do Gitleaks só é instalado se o SHA256 bater com o valor fixado no workflow. |
+| [CICD-SEC-10: Insufficient Logging and Visibility](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-10-Insufficient-Logging-And-Visibility) | Uma falha aparece no log do job e derruba a execução. O step `Scan` do Gitleaks registra qual config usou. |
+
+## 2.2. Pendências conhecidas
+
+O que ainda não segue a tabela acima:
+
+- A `main` não tem proteção de branch nem ruleset. A revisão por pull request é prática, não regra (CICD-SEC-1).
+- O token padrão do repositório tem permissão de escrita, qualquer action pode rodar, e a exigência de SHA nas actions (`sha_pinning_required`) está desligada. Os workflows daqui declaram `permissions`, mas o padrão deveria ser só leitura (CICD-SEC-3, CICD-SEC-5 e CICD-SEC-7).
+- O `_check-workflows.yaml`, o `_release.yaml`, o `aws-cloudfront-deploy` e o `aws-eks-deploy` referenciam actions por tag (`@v4`, `@v1`), e não por SHA (CICD-SEC-3).
+- As composite actions de AWS interpolam `${{ inputs.* }}` dentro do `run:` (CICD-SEC-4).
+- No `_check-workflows.yaml`, o actionlint roda com `continue-on-error: true` e nunca falha o build, e o checkout não usa `persist-credentials: false` (CICD-SEC-6 e CICD-SEC-10).
+- O `_release.yaml` pede `id-token: write` sem usar, não tem `timeout-minutes` e instala pacotes npm que não usa (`@semantic-release/gitlab`, `@semantic-release/npm`, `@semantic-release/exec` e o commitlint), fixados por versão mas sem lockfile (CICD-SEC-3, CICD-SEC-5 e CICD-SEC-7).
+
+## 2.3. No seu pipeline
+
+Os mesmos princípios valem para o repositório que chama:
+
+- Fixe este repositório e qualquer action de terceiros pelo SHA completo.
+- Declare `permissions` mínimas no workflow que chama. O GitHub deixa um reusable workflow reduzir as permissões que recebe, mas nunca aumentar, então o limite é o que você concede.
+- Proteja a branch principal e exija revisão em pull request.
+- Deixe o token padrão do repositório como só leitura, em Settings > Actions > General.
+- Para acessar a nuvem, prefira OIDC a segredos de longa duração.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+# 3. Catálogo
+
+## 3.1. Reusable workflows
 
 | Workflow | O que faz | Documentação |
 | --- | --- | --- |
 | [`gitleaks.yaml`](.github/workflows/gitleaks.yaml) | Procura segredos versionados com o Gitleaks. A config é opcional: sem ela, usa as regras padrão | [README](docs/workflows/gitleaks/README.md) |
 
-## 2.2. Composite actions
+## 3.2. Composite actions
 
 | Action | O que faz | Documentação |
 | --- | --- | --- |
@@ -107,14 +155,14 @@ Pré-requisitos de credenciais e observações de cada action estão no [catálo
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# 3. Implementação
+# 4. Implementação
 
-## 3.1. Pré-requisitos
+## 4.1. Pré-requisitos
 
 - GitHub Actions habilitado no repositório que vai consumir as peças. Este repositório é público, então qualquer repositório pode chamá-lo, a menos que a política de Actions da organização bloqueie actions e workflows de fora.
 - Para as actions de AWS, uma role IAM que confie no provedor OIDC do GitHub e `permissions: id-token: write` no job. Os detalhes estão no [catálogo de actions](actions/README.md#31-credenciais-aws).
 
-## 3.2. Chamando um reusable workflow
+## 4.2. Chamando um reusable workflow
 
 O reusable workflow entra no lugar de um job inteiro:
 
@@ -135,7 +183,7 @@ jobs:
 
 Para usar uma config própria, passe `with: config: <caminho>`. A ordem de busca está na [página do workflow](docs/workflows/gitleaks/README.md#23-qual-config-é-usada).
 
-## 3.3. Usando uma composite action
+## 4.3. Usando uma composite action
 
 A composite action entra como um step dentro de um job seu:
 
@@ -156,7 +204,7 @@ jobs:
         path: dist
 ```
 
-## 3.4. Fixando a versão pelo SHA
+## 4.4. Fixando a versão pelo SHA
 
 Tags e branches podem passar a apontar para outro commit, e aí o código que roda no seu pipeline muda junto, com o `GITHUB_TOKEN` do seu repositório. Um SHA completo, de 40 caracteres, sempre aponta para o mesmo commit. É a recomendação do GitHub em [Secure use reference](https://docs.github.com/en/actions/reference/security/secure-use#using-third-party-actions).
 
@@ -170,7 +218,7 @@ Para atualizar, troque o SHA num commit próprio, de preferência por pull reque
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# 4. Referências
+# 5. Referências
 
 Links relevantes para essa documentação:
 
@@ -182,25 +230,25 @@ Links relevantes para essa documentação:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# 5. Contribuição
+# 6. Contribuição
 
 Gostaria de contribuir? Isso é ótimo! Temos um guia de contribuição para te ajudar. Clique [aqui](CONTRIBUTING.md) para lê-lo. Ele também explica como adicionar um novo workflow ou action.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# 6. Versionamento
+# 7. Versionamento
 
 Para verificar o histórico de mudanças, acesse o arquivo [**CHANGELOG.md**](CHANGELOG.md).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# 7. Troubleshooting
+# 8. Troubleshooting
 
 Se você tiver algum problema, abra uma [issue](https://github.com/lpsm-dev/reusable-workflows/issues/new/choose) nesse projeto.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# 8. Show your support
+# 9. Show your support
 
 <div align="center">
 
