@@ -1,5 +1,7 @@
 # Semantic Versioning Changelog
 
+> Este arquivo para na versão 1.0.0. As notas das versões seguintes ficam nos [GitHub Releases](https://github.com/lpsm-dev/reusable-workflows/releases).
+
 ## 1.0.0 (2024-04-05)
 
 

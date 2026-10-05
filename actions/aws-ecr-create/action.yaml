@@ -16,8 +16,11 @@ runs:
   steps:
   - name: Check to see if the ECR repo exists
     shell: bash
+    env:
+      REGION: ${{ inputs.aws-region }}
+      REPOSITORY: ${{ inputs.repository-name }}
     run: |
-      if ! aws ecr describe-repositories --region ${{ inputs.aws-region }} --repository-names ${{ inputs.repository-name }} &>/dev/null; then
-        echo "The ECR repository ${{ inputs.repository-name }} was not found. Creating...."
-        aws ecr create-repository --region ${{ inputs.aws-region }} --repository-name ${{ inputs.repository-name }}
+      if ! aws ecr describe-repositories --region "$REGION" --repository-names "$REPOSITORY" &>/dev/null; then
+        echo "The ECR repository $REPOSITORY was not found. Creating...."
+        aws ecr create-repository --region "$REGION" --repository-name "$REPOSITORY"
       fi

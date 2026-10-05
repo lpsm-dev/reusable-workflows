@@ -4,11 +4,7 @@ name: Common - Check Actions + Workflows
 on:
   push:
     branches: [main]
-    paths: [.github/workflows/**, actions/**]
   pull_request:
-    branches: [main]
-    paths: [.github/workflows/**, actions/**]
-    types: [opened, synchronize]
   workflow_dispatch:
 
 concurrency:
@@ -17,7 +13,6 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   action-lint:
@@ -26,32 +21,35 @@ jobs:
     timeout-minutes: 5
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v4
-    - uses: devops-actions/actionlint@v0.1.9
-      id: action-lint
-      continue-on-error: true
-    - uses: actions/upload-artifact@v4
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       with:
-        name: actionlint-results
-        path: ${{ steps.action-lint.outputs.results-file }}
+        persist-credentials: false
+    - name: Install actionlint
+      run: |
+        set -euo pipefail
+        version="1.7.12"
+        archive="actionlint_${version}_linux_amd64.tar.gz"
+        url="https://github.com/rhysd/actionlint/releases/download/v${version}/${archive}"
+        checksum="8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+        work="$(mktemp -d)"
+        curl -fsSL -o "${work}/${archive}" "$url"
+        printf '%s  %s\n' "$checksum" "$archive" | (cd "$work" && sha256sum -c)
+        tar -xzf "${work}/${archive}" -C "$work" actionlint
+        sudo install -m 0755 "${work}/actionlint" /usr/local/bin/actionlint
+        rm -rf "$work"
+        actionlint -version
+    - name: Run actionlint
+      run: actionlint -color
   yaml-lint:
     name: YAML Lint
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v4
-    - name: Run YAML Lint in PR
-      uses: reviewdog/action-yamllint@v1
-      if: ${{ github.event_name == 'pull_request' && !contains(github.ref, 'renovate') }}
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        reporter: github-check
-        yamllint_flags: "-c .github/config/.yamllint.yaml ."
-    - name: Run YAML Lint in Branch
-      uses: reviewdog/action-yamllint@v1
-      if: ${{ github.event_name != 'pull_request' && !contains(github.ref, 'renovate') }}
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        reporter: github-check
-        yamllint_flags: "-c .github/config/.yamllint.yaml ."
+        persist-credentials: false
+    - name: Run yamllint
+      run: |
+        yamllint --version
+        yamllint --strict --format github -c .github/config/.yamllint.yaml .

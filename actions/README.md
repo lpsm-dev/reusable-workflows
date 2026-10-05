@@ -62,7 +62,7 @@ steps:
 
 - O `aws-eks-deploy` monta a imagem como `<registry do ECR>/<image-name>:<image-tag>` e atualiza o container que tem o mesmo nome do deployment (`app-name`). Se o container tiver outro nome, o `kubectl set image` falha.
 - O `aws-cloudfront-deploy` escolhe a primeira distribuição cuja primeira origem contém `<s3-bucket-name>.<s3-bucket-domain>` e invalida `/*` nela. O step espera a invalidação terminar.
-- As actions ainda não seguem todo o checklist do OWASP: o `aws-cloudfront-deploy` e o `aws-eks-deploy` referenciam actions de terceiros por tag, e não por SHA, e as três interpolam `${{ inputs.* }}` dentro do `run:`. Essas pendências estão listadas na seção [Segurança](../README.md#22-pendências-conhecidas) do README.
+- As actions de terceiros usadas aqui são fixadas por SHA, e os inputs chegam aos scripts por `env:`, como pede o [checklist de segurança](../CONTRIBUTING.md#4-segurança).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <!-- END_DOCS -->
