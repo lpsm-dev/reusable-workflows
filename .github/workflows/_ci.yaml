@@ -16,4 +16,6 @@ jobs:
   scan:
     uses: ./.github/workflows/gitleaks.yaml
     with:
-      config: .github/config/.gitleaks.toml
+      # The AzSK example doubles as this repository's ruleset, so CI fails if
+      # a Gitleaks upgrade stops it from loading.
+      config: docs/workflows/gitleaks/azsk.toml

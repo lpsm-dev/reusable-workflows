@@ -30,7 +30,7 @@ tasks:
     - sh: "which gitleaks"
       msg: "gitleaks {{ .PATH_ERROR }}"
     cmds:
-    - gitleaks detect --source={{ .TASKFILE_DIR }} --config={{ .TASKFILE_DIR }}/.github/config/.gitleaks.toml --redact --verbose
+    - gitleaks detect --source={{ .TASKFILE_DIR }} --redact --verbose
 
   yamllint:
     desc: Running a linter for YAML files
