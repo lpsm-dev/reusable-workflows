@@ -26,8 +26,7 @@ Seja bem-vindo e obrigado por considerar contribuir com este projeto! Ler e segu
 [3. Adicionando componentes](#3-adicionando-componentes)<br>
 &nbsp;&nbsp;&nbsp;[3.1. Reusable workflow](#31-reusable-workflow)<br>
 &nbsp;&nbsp;&nbsp;[3.2. Composite action](#32-composite-action)<br>
-&nbsp;&nbsp;&nbsp;[3.3. Template](#33-template)<br>
-&nbsp;&nbsp;&nbsp;[3.4. Workflow interno](#34-workflow-interno)<br>
+&nbsp;&nbsp;&nbsp;[3.3. Workflow interno](#33-workflow-interno)<br>
 [4. Padrão de documentação](#4-padrão-de-documentação)<br>
 [5. Mensagens de commit](#5-mensagens-de-commit)<br>
 &nbsp;&nbsp;&nbsp;[5.1. Tipo](#51-tipo)<br>
@@ -105,7 +104,7 @@ Execute `task` na raiz do repositório para listar os comandos. Os mais usados:
 | `task yamllint` | Valida os arquivos YAML com a config de `.github/config/.yamllint.yaml` |
 | `task github:action:lint` | Roda o `actionlint` nos workflows |
 | `task github:action:docs` | Gera o `README.md` de cada composite action a partir do `action.yaml` |
-| `task gitleaks` | Procura segredos com a config de `.github/config/.gitleaks.toml` |
+| `task gitleaks` | Procura segredos no histórico do repositório com as regras padrão do Gitleaks |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -118,9 +117,10 @@ Antes de criar algo, veja em [Estrutura do repositório](README.md#12-estrutura-
 1. Crie o arquivo direto em `.github/workflows/`, sem subpasta e sem `_` no início do nome, por exemplo `.github/workflows/terraform-plan.yaml`. O GitHub não encontra reusable workflows em subpastas.
 2. Use `on: workflow_call` como único gatilho e declare `permissions` mínimas.
 3. Fixe toda action de terceiros pelo SHA completo, com a versão num comentário (`# v7.0.1`).
-4. Escreva a página do workflow em `docs/workflows/<nome>.md`, seguindo o modelo de [`docs/workflows/gitleaks.md`](docs/workflows/gitleaks.md).
-5. Adicione uma linha na tabela de [reusable workflows](README.md#21-reusable-workflows) do README.
-6. Teste antes do merge. Se o workflow fizer sentido para este repositório, chame-o no [`_ci.yaml`](.github/workflows/_ci.yaml) pelo caminho relativo (`uses: ./.github/workflows/<nome>.yaml`), que roda a versão do próprio branch. Se não fizer, chame-o de um repositório de teste apontando para o SHA do seu branch.
+4. Se a ferramenta usa um arquivo de config, faça o workflow funcionar sem ele, com o padrão da ferramenta, e aceite o caminho num input opcional. Não crie arquivo para o projeto copiar: exemplos opcionais ficam na pasta do workflow, como o [`azsk.toml`](docs/workflows/gitleaks/azsk.toml) do Gitleaks.
+5. Escreva a página do workflow em `docs/workflows/<nome>/README.md`, seguindo o modelo de [`docs/workflows/gitleaks/README.md`](docs/workflows/gitleaks/README.md).
+6. Adicione uma linha na tabela de [reusable workflows](README.md#21-reusable-workflows) do README.
+7. Teste antes do merge. Se o workflow fizer sentido para este repositório, chame-o no [`_ci.yaml`](.github/workflows/_ci.yaml) pelo caminho relativo (`uses: ./.github/workflows/<nome>.yaml`), que roda a versão do próprio branch. Se não fizer, chame-o de um repositório de teste apontando para o SHA do seu branch.
 
 > [!WARNING]
 > Dentro de um reusable workflow, o contexto `github` é o do repositório que chama. Um `uses: ./actions/<nome>` procura a action no workspace, que tem o código de quem chama, e não o deste repositório. Para usar uma composite action daqui, referencie `lpsm-dev/reusable-workflows/actions/<nome>@<sha-completo>`.
@@ -132,22 +132,16 @@ Antes de criar algo, veja em [Estrutura do repositório](README.md#12-estrutura-
 3. Rode `task github:action:docs`. A task cria o `actions/<nome>/README.md` com os marcadores do action-docs e gera descrição, entradas e exemplo de uso a partir do `action.yaml`.
 4. Adicione uma linha no [catálogo de actions](actions/README.md#2-catálogo) e na tabela de [composite actions](README.md#22-composite-actions) do README.
 
-## 3.3. Template
+## 3.3. Workflow interno
 
-1. Crie o arquivo em `templates/<ferramenta>/<variante>.<extensão>`, por exemplo `templates/gitleaks/default.toml`.
-2. Valide o arquivo com a mesma versão da ferramenta que os workflows usam. Para o Gitleaks, por exemplo: `gitleaks detect --no-git --source . --config templates/gitleaks/<variante>.toml`.
-3. Documente em [`templates/README.md`](templates/README.md) para onde copiar e quando usar, e adicione uma linha na tabela de [templates](README.md#23-templates) do README.
-
-## 3.4. Workflow interno
-
-Automação que serve só a este repositório, como CI e release, fica em `.github/workflows/` com `_` no início do nome: `_ci.yaml` (Gitleaks), `_check-workflows.yaml` (actionlint e yamllint) e `_release.yaml` (semantic-release). A configuração das ferramentas desses workflows fica em `.github/config/`. Nada de fora deve chamar esses arquivos.
+Automação que serve só a este repositório, como CI e release, fica em `.github/workflows/` com `_` no início do nome: `_ci.yaml` (Gitleaks), `_check-workflows.yaml` (actionlint e yamllint) e `_release.yaml` (semantic-release). A configuração das ferramentas desses workflows fica em `.github/config/` e serve só a este repositório: não é modelo para outros projetos copiarem. Nada de fora deve chamar esses arquivos.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 # 4. Padrão de documentação
 
 - A documentação é escrita em português. Código, nomes de inputs e descrições dentro do `action.yaml` ficam em inglês.
-- Os documentos escritos à mão (READMEs, este guia e as páginas de `docs/workflows/`) seguem o esqueleto abaixo: marcadores `BEGIN_DOCS` e `END_DOCS`, âncora `readme-top`, link "◀ Voltar" para a página de cima (menos no README raiz), seções numeradas (`# 1. Visão Geral`, `## 1.1. Objetivo`) e o link "back to top" no fim de cada seção `#`.
+- Os documentos escritos à mão (READMEs, este guia e as páginas em `docs/workflows/<nome>/README.md`) seguem o esqueleto abaixo: marcadores `BEGIN_DOCS` e `END_DOCS`, âncora `readme-top`, link "◀ Voltar" para a página de cima (menos no README raiz), seções numeradas (`# 1. Visão Geral`, `## 1.1. Objetivo`) e o link "back to top" no fim de cada seção `#`.
 - O sumário fica entre os marcadores `START_TABLE_OF_CONTENTS` e `END_TABLE_OF_CONTENTS`. Quem gera o sumário e a numeração das seções é o [gtoc](https://github.com/lpsm-dev/gtoc): escreva os títulos sem número e rode `gtoc generate --number-headings <arquivo>.md`. Links para seções usam a âncora numerada, como `#12-estrutura-do-repositório`.
 - Não escreva os comentários HTML desses marcadores em código inline no meio do texto. O gtoc trata a linha como sumário e deixa de numerar todas as seções seguintes. Dentro de bloco de código, como no esqueleto, não há problema.
 - Os `README.md` das composite actions são gerados pelo `task github:action:docs`. Não edite o trecho entre os marcadores `action-docs-all` à mão.
@@ -219,14 +213,14 @@ Descreve o tipo de alteração do commit. Temos as seguintes opções:
 
 ## 5.2. Escopo
 
-É qualquer coisa que forneça informações adicionais ou que especifique o local da alteração. Neste repositório, o escopo costuma ser o nome do componente, como `gitleaks`, `aws-eks-deploy` ou `templates`. Cada tipo (`type`) de commit pode ter um escopo (`scope`) opcional, e cabe a você adicionar ou omitir essa informação. Por exemplo:
+É qualquer coisa que forneça informações adicionais ou que especifique o local da alteração. Neste repositório, o escopo costuma ser o nome do componente, como `gitleaks`, `aws-eks-deploy` ou `task`. Cada tipo (`type`) de commit pode ter um escopo (`scope`) opcional, e cabe a você adicionar ou omitir essa informação. Por exemplo:
 
 ```txt
 feat(gitleaks): add config input
 ```
 
 > [!NOTE]
-> Use letras minúsculas e kebab-case no escopo, como nos commits que já existem: `feat(gitleaks)`, `docs(templates)`, `chore(deps)`.
+> Use letras minúsculas e kebab-case no escopo, como nos commits que já existem: `feat(gitleaks)`, `docs(layout)`, `chore(deps)`.
 
 ## 5.3. Descrição
 

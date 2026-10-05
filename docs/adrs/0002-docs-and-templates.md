@@ -5,7 +5,7 @@ date: 2026-10-04
 
 # Documentação por componente e templates por ferramenta
 
-Complementa o [0001](0001-layout.md). As três superfícies continuam as mesmas.
+Complementa o [0001](0001-layout.md). As três superfícies continuam as mesmas. A parte sobre `templates/` e o caminho `docs/workflows/<nome>.md` foram substituídos pelo [0003](0003-remove-templates.md).
 
 ## Contexto
 
