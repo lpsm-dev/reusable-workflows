@@ -1,3 +1,10 @@
+<!-- BEGIN_DOCS -->
+
+[◀ Voltar](../README.md)
+
+<!-- action-docs-all source="action.yaml" project="lpsm-dev/reusable-workflows/actions/aws-eks-deploy" version="<sha-completo>" -->
+# AWS EKS Deploy
+
 ## Description
 
 Action to update a Kubernetes deployment image in AWS EKS using Kubectl
@@ -24,7 +31,7 @@ This action is a `composite` action.
 ## Usage
 
 ```yaml
-- uses: ***PROJECT***@***VERSION***
+- uses: lpsm-dev/reusable-workflows/actions/aws-eks-deploy@<sha-completo>
   with:
     aws-role-arn:
     # The AWS Role to assume and execute actions in the pipeline that interact with AWS services
@@ -80,6 +87,6 @@ This action is a `composite` action.
     # Required: false
     # Default: v1.29.1
 ```
+<!-- action-docs-all source="action.yaml" project="lpsm-dev/reusable-workflows/actions/aws-eks-deploy" version="<sha-completo>" -->
 
-
-
+<!-- END_DOCS -->

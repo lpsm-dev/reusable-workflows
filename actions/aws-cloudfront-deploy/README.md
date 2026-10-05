@@ -1,3 +1,10 @@
+<!-- BEGIN_DOCS -->
+
+[◀ Voltar](../README.md)
+
+<!-- action-docs-all source="action.yaml" project="lpsm-dev/reusable-workflows/actions/aws-cloudfront-deploy" version="<sha-completo>" -->
+# Deploy to Cloudfront
+
 ## Description
 
 Action to upload files to S3 and create a Cloudfront cache invalidation
@@ -21,7 +28,7 @@ This action is a `composite` action.
 ## Usage
 
 ```yaml
-- uses: ***PROJECT***@***VERSION***
+- uses: lpsm-dev/reusable-workflows/actions/aws-cloudfront-deploy@<sha-completo>
   with:
     aws-role-arn:
     # The AWS Role to assume and execute actions in the pipeline that interact with AWS services
@@ -59,6 +66,6 @@ This action is a `composite` action.
     # Required: true
     # Default: ""
 ```
+<!-- action-docs-all source="action.yaml" project="lpsm-dev/reusable-workflows/actions/aws-cloudfront-deploy" version="<sha-completo>" -->
 
-
-
+<!-- END_DOCS -->
