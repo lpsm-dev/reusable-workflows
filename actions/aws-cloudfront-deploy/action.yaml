@@ -29,7 +29,7 @@ runs:
   using: composite
   steps:
   - name: Assume AWS IAM Role
-    uses: aws-actions/configure-aws-credentials@v4
+    uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a  # v4.3.1
     with:
       aws-region: ${{ inputs.aws-region }}
       role-to-assume: ${{ inputs.aws-role-arn }}
@@ -37,15 +37,20 @@ runs:
       mask-aws-account-id: false
   - name: Sync to AWS S3
     shell: bash
+    env:
+      SOURCE_PATH: ${{ inputs.path }}
+      BUCKET: ${{ inputs.s3-bucket-name }}
     run: |
       ls -al
-      aws s3 sync ${{ inputs.path }} s3://${{ inputs.s3-bucket-name }}
+      aws s3 sync "$SOURCE_PATH" "s3://$BUCKET"
   - name: Create invalidation cache in AWS CloudFront
     shell: bash
+    env:
+      ORIGIN: ${{ inputs.s3-bucket-name }}.${{ inputs.s3-bucket-domain }}
     run: |
       #!/usr/bin/env bash
       set -eou pipefail
-      AWS_CLOUDFRONT_DISTRIBUTION_ID=`aws cloudfront list-distributions --query "DistributionList.Items[].{Id: Id, OriginDomainName: Origins.Items[0].DomainName}[?contains(OriginDomainName, '${{ inputs.s3-bucket-name }}.${{ inputs.s3-bucket-domain }}')] | [0]" | jq -r '.Id'`
+      AWS_CLOUDFRONT_DISTRIBUTION_ID=`aws cloudfront list-distributions --query "DistributionList.Items[].{Id: Id, OriginDomainName: Origins.Items[0].DomainName}[?contains(OriginDomainName, '${ORIGIN}')] | [0]" | jq -r '.Id'`
       echo "AWS Cloudfront distribution ID: $AWS_CLOUDFRONT_DISTRIBUTION_ID"
       AWS_CLOUDFRONT_INVALIDATION_ID=`aws cloudfront create-invalidation --distribution-id=$AWS_CLOUDFRONT_DISTRIBUTION_ID --paths "/*" | jq -r .Invalidation.Id`
       echo "AWS Cloudfront invalidation ID: $AWS_CLOUDFRONT_INVALIDATION_ID"

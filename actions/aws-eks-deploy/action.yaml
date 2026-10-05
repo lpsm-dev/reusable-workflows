@@ -41,27 +41,32 @@ runs:
   using: composite
   steps:
   - name: Install Kubectl
-    uses: azure/setup-kubectl@v4
+    uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede  # v4.0.1
     with:
       version: ${{ inputs.kubectl-version }}
   - name: Assume AWS IAM Role
-    uses: aws-actions/configure-aws-credentials@v4
+    uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a  # v4.3.1
     with:
       aws-region: ${{ inputs.aws-region }}
       role-to-assume: ${{ inputs.aws-role-arn }}
       role-session-name: ${{ inputs.aws-session-name }}
       mask-aws-account-id: false
   - name: Login to Amazon ECR
-    uses: aws-actions/amazon-ecr-login@v2
+    uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd  # v2.1.7
     id: login-ecr
     with:
       mask-password: true
   - name: Get AWS EKS kubeconfig
     shell: bash
-    run: aws eks update-kubeconfig --name ${{ inputs.eks-cluster-name }} --region ${{ inputs.aws-region }}
+    env:
+      CLUSTER: ${{ inputs.eks-cluster-name }}
+      REGION: ${{ inputs.aws-region }}
+    run: aws eks update-kubeconfig --name "$CLUSTER" --region "$REGION"
   - name: Update image tag of Kubernetes deployment
     shell: bash
     env:
       IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
+      APP: ${{ inputs.app-name }}
+      NAMESPACE: ${{ inputs.eks-namespace }}
     run: |
-      kubectl set image deployment/${{ inputs.app-name }} ${{ inputs.app-name }}=$IMAGE -n ${{ inputs.eks-namespace }}
+      kubectl set image "deployment/$APP" "$APP=$IMAGE" -n "$NAMESPACE"
