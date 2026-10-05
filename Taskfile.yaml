@@ -1,7 +1,7 @@
 ---
 # Taskfile to be used with `task` binary.
 # Usage:
-# - Install with `asdf`: `asdf plugin add task`
+# - Install with Devbox: `devbox shell` (see CONTRIBUTING.md)
 # - List available tasks with: `task --list`
 version: "3"
 
@@ -30,7 +30,7 @@ tasks:
     - sh: "which gitleaks"
       msg: "gitleaks {{ .PATH_ERROR }}"
     cmds:
-    - gitleaks detect --source={{ .TASKFILE_DIR }} --verbose
+    - gitleaks detect --source={{ .TASKFILE_DIR }} --config={{ .TASKFILE_DIR }}/.github/config/.gitleaks.toml --redact --verbose
 
   yamllint:
     desc: Running a linter for YAML files

@@ -2,35 +2,33 @@
 version: "3"
 
 vars:
+  ACTION_DOCS_VERSION: 2.5.1
   DIR_GITHUB_CUSTOM_ACTIONS: "{{ .ROOT_DIR }}/actions"
-  DIR_GITHUB_WORKFLOWS: "{{ .ROOT_DIR }}/.github/workflows"
+  REPOSITORY: lpsm-dev/reusable-workflows
 
 tasks:
   action:docs:
-    desc: Creating Custom Actions and Reusable Workflows README.md docs
+    desc: Generating the README.md of each composite action from its action.yaml
     preconditions:
-    - sh: which action-docs
-      msg: kind {{ .PATH_ERROR }}
+    - sh: which npx
+      msg: npx {{ .PATH_ERROR }}
     cmds:
     - |
-      custom_action_dir={{ .DIR_GITHUB_CUSTOM_ACTIONS }}
-      find $custom_action_dir -type f -name "action.yaml" -exec dirname {} \; | uniq | while read -r dir; do
-        echo "Running action-docs int $dir" && (cd "$dir" && action-docs --source=action.yaml --no-banner --line-breaks=LF > README.md)
-      done
-
-      reusable_workflows_dir={{ .DIR_GITHUB_WORKFLOWS }}
-      mkdir -p "$reusable_workflows_dir/docs"
-      reusable_workflows_dir_docs="$reusable_workflows_dir/docs"
-      find "$reusable_workflows_dir" -type f -name "reusable-*.yaml" | while read -r file; do
-        echo "Running action-docs in $file"
-        action-docs --source="$file" --no-banner --line-breaks=LF > "${file%.*}.md"
-        mv "${file%.*}.md" "$reusable_workflows_dir_docs"
+      for file in {{ .DIR_GITHUB_CUSTOM_ACTIONS }}/*/action.yaml; do
+        dir="$(dirname "$file")"
+        name="$(basename "$dir")"
+        if ! grep -q "action-docs-all" "$dir/README.md" 2>/dev/null; then
+          marker="<!-- action-docs-all source=\"action.yaml\" project=\"{{ .REPOSITORY }}/actions/$name\" version=\"<sha-completo>\" -->"
+          printf '%s\n\n%s\n\n%s\n%s\n\n%s\n' "<!-- BEGIN_DOCS -->" "[◀ Voltar](../README.md)" "$marker" "$marker" "<!-- END_DOCS -->" > "$dir/README.md"
+        fi
+        echo "Running action-docs in $dir"
+        (cd "$dir" && npx --yes action-docs@{{ .ACTION_DOCS_VERSION }} --no-banner --line-breaks=LF --toc-level=1 --include-name-header --source=action.yaml --update-readme=README.md)
       done
 
   action:lint:
     desc: Linting Custom Actions and Reusable Workflows
     preconditions:
     - sh: which actionlint
-      msg: kind {{ .PATH_ERROR }}
+      msg: actionlint {{ .PATH_ERROR }}
     cmds:
     - actionlint
