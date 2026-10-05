@@ -17,9 +17,12 @@ tasks:
       for file in {{ .DIR_GITHUB_CUSTOM_ACTIONS }}/*/action.yaml; do
         dir="$(dirname "$file")"
         name="$(basename "$dir")"
-        if ! grep -q "action-docs-all" "$dir/README.md" 2>/dev/null; then
-          marker="<!-- action-docs-all source=\"action.yaml\" project=\"{{ .REPOSITORY }}/actions/$name\" version=\"<sha-completo>\" -->"
-          printf '%s\n\n%s\n\n%s\n%s\n\n%s\n' "<!-- BEGIN_DOCS -->" "[◀ Voltar](../README.md)" "$marker" "$marker" "<!-- END_DOCS -->" > "$dir/README.md"
+        readme="$dir/README.md"
+        marker="<!-- action-docs-all source=\"action.yaml\" project=\"{{ .REPOSITORY }}/actions/$name\" version=\"<sha-completo>\" -->"
+        if [ ! -f "$readme" ]; then
+          printf '%s\n\n%s\n\n%s\n%s\n\n%s\n' "<!-- BEGIN_DOCS -->" "[◀ Voltar](../README.md)" "$marker" "$marker" "<!-- END_DOCS -->" > "$readme"
+        elif ! grep -q "action-docs-all" "$readme"; then
+          printf '\n%s\n%s\n' "$marker" "$marker" >> "$readme"
         fi
         echo "Running action-docs in $dir"
         (cd "$dir" && npx --yes action-docs@{{ .ACTION_DOCS_VERSION }} --no-banner --line-breaks=LF --toc-level=1 --include-name-header --source=action.yaml --update-readme=README.md)
