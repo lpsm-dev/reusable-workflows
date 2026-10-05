@@ -5,7 +5,7 @@ date: 2026-10-04
 
 # Documentação por componente e templates por ferramenta
 
-Complementa o [0001](0001-layout.md). As três superfícies continuam as mesmas. A parte sobre `templates/` e o caminho `docs/workflows/<nome>.md` foram substituídos pelo [0003](0003-remove-templates.md).
+Complementa o [0001](0001-layout.md) sem mudar as três superfícies que existiam na época. Depois, o [0003](0003-remove-templates.md) removeu `templates/`, deixando só workflows e composite actions, e trocou o caminho `docs/workflows/<nome>.md` por `docs/workflows/<nome>/README.md`.
 
 ## Contexto
 
