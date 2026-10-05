@@ -1,3 +1,10 @@
+<!-- BEGIN_DOCS -->
+
+[◀ Voltar](../README.md)
+
+<!-- action-docs-all source="action.yaml" project="lpsm-dev/reusable-workflows/actions/aws-ecr-create" version="<sha-completo>" -->
+# AWS ECR Create
+
 ## Description
 
 Action to create an ECR if doesn't exist
@@ -17,7 +24,7 @@ This action is a `composite` action.
 ## Usage
 
 ```yaml
-- uses: ***PROJECT***@***VERSION***
+- uses: lpsm-dev/reusable-workflows/actions/aws-ecr-create@<sha-completo>
   with:
     aws-region:
     # The region in AWS that we will be working in
@@ -31,6 +38,6 @@ This action is a `composite` action.
     # Required: true
     # Default: ""
 ```
+<!-- action-docs-all source="action.yaml" project="lpsm-dev/reusable-workflows/actions/aws-ecr-create" version="<sha-completo>" -->
 
-
-
+<!-- END_DOCS -->
