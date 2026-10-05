@@ -29,6 +29,14 @@ Seja bem-vindo e obrigado por considerar contribuir com este projeto! Ler e segu
 &nbsp;&nbsp;&nbsp;[3.3. Template](#33-template)<br>
 &nbsp;&nbsp;&nbsp;[3.4. Workflow interno](#34-workflow-interno)<br>
 [4. Padrão de documentação](#4-padrão-de-documentação)<br>
+[5. Mensagens de commit](#5-mensagens-de-commit)<br>
+&nbsp;&nbsp;&nbsp;[5.1. Tipo](#51-tipo)<br>
+&nbsp;&nbsp;&nbsp;[5.2. Escopo](#52-escopo)<br>
+&nbsp;&nbsp;&nbsp;[5.3. Descrição](#53-descrição)<br>
+[6. Pull requests](#6-pull-requests)<br>
+&nbsp;&nbsp;&nbsp;[6.1. Passo a passo](#61-passo-a-passo)<br>
+&nbsp;&nbsp;&nbsp;[6.2. Revisão](#62-revisão)<br>
+[7. Versionamento](#7-versionamento)<br>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -139,14 +147,41 @@ Automação que serve só a este repositório, como CI e release, fica em `.gith
 # 4. Padrão de documentação
 
 - A documentação é escrita em português. Código, nomes de inputs e descrições dentro do `action.yaml` ficam em inglês.
-- Os documentos escritos à mão (READMEs, este guia e as páginas de `docs/workflows/`) seguem o mesmo esqueleto: marcadores `<!-- BEGIN_DOCS -->` e `<!-- END_DOCS -->`, âncora `readme-top`, link "◀ Voltar" para a página de cima (menos no README raiz), seções numeradas (`# 1. Visão Geral`, `## 1.1. Objetivo`) e o link "back to top" no fim de cada seção `#`.
-- O sumário fica entre `<!-- START_TABLE_OF_CONTENTS -->` e `<!-- END_TABLE_OF_CONTENTS -->`. Quem gera o sumário e a numeração das seções é o [gtoc](https://github.com/lpsm-dev/gtoc): escreva os títulos sem número e rode `gtoc generate --number-headings <arquivo>.md`. Links para seções usam a âncora numerada, como `#12-estrutura-do-repositório`.
+- Os documentos escritos à mão (READMEs, este guia e as páginas de `docs/workflows/`) seguem o esqueleto abaixo: marcadores `BEGIN_DOCS` e `END_DOCS`, âncora `readme-top`, link "◀ Voltar" para a página de cima (menos no README raiz), seções numeradas (`# 1. Visão Geral`, `## 1.1. Objetivo`) e o link "back to top" no fim de cada seção `#`.
+- O sumário fica entre os marcadores `START_TABLE_OF_CONTENTS` e `END_TABLE_OF_CONTENTS`. Quem gera o sumário e a numeração das seções é o [gtoc](https://github.com/lpsm-dev/gtoc): escreva os títulos sem número e rode `gtoc generate --number-headings <arquivo>.md`. Links para seções usam a âncora numerada, como `#12-estrutura-do-repositório`.
+- Não escreva os comentários HTML desses marcadores em código inline no meio do texto. O gtoc trata a linha como sumário e deixa de numerar todas as seções seguintes. Dentro de bloco de código, como no esqueleto, não há problema.
 - Os `README.md` das composite actions são gerados pelo `task github:action:docs`. Não edite o trecho entre os marcadores `action-docs-all` à mão.
 - ADRs ficam em `docs/adrs/NNNN-<titulo>.md`, com front matter (`status` e `date`) e as seções Contexto, Decisão, Opções consideradas e Consequências.
 
+Esqueleto de uma página nova:
+
+```markdown
+<!-- BEGIN_DOCS -->
+
+[◀ Voltar](../README.md)
+
+<div align="center">
+
+<a name="readme-top"></a>
+
+**Título da página**
+
+</div>
+
+<!-- START_TABLE_OF_CONTENTS -->
+<!-- END_TABLE_OF_CONTENTS -->
+
+# Visão Geral
+
+Texto da seção.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<!-- END_DOCS -->
+```
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# Mensagens de commit
+# 5. Mensagens de commit
 
 Nesse projeto, exigimos que **todos os commits** sigam um formato específico de mensagem, o [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Com isso, conseguimos:
 
@@ -164,7 +199,7 @@ Veja como é organizado esse formato de commits:
 [optional body]
 ```
 
-## Tipo
+## 5.1. Tipo
 
 Descreve o tipo de alteração do commit. Temos as seguintes opções:
 
@@ -182,7 +217,7 @@ Descreve o tipo de alteração do commit. Temos as seguintes opções:
 | **chore** | Outras alterações que não modificam arquivos de origem ou de teste. Use esse tipo ao adicionar ou atualizar dependências de desenvolvimento. |
 | **revert** | Reverte um commit anterior. |
 
-## Escopo
+## 5.2. Escopo
 
 É qualquer coisa que forneça informações adicionais ou que especifique o local da alteração. Neste repositório, o escopo costuma ser o nome do componente, como `gitleaks`, `aws-eks-deploy` ou `templates`. Cada tipo (`type`) de commit pode ter um escopo (`scope`) opcional, e cabe a você adicionar ou omitir essa informação. Por exemplo:
 
@@ -193,7 +228,7 @@ feat(gitleaks): add config input
 > [!NOTE]
 > Use letras minúsculas e kebab-case no escopo, como nos commits que já existem: `feat(gitleaks)`, `docs(templates)`, `chore(deps)`.
 
-## Descrição
+## 5.3. Descrição
 
 É o campo onde você diz o que foi feito no commit, de forma breve. Para isso, recomendamos que:
 
@@ -207,11 +242,11 @@ feat(gitleaks): add config input
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# Pull requests
+# 6. Pull requests
 
 Ao criar um pull request (PR), defina o título seguindo a mesma convenção das mensagens de commit. Como o merge é feito com **squash**, o título do PR vira a mensagem final do commit na `main`, e o histórico fica enxuto e linear.
 
-## Passo a passo
+## 6.1. Passo a passo
 
 - Crie uma branch a partir da branch `main`:
 
@@ -253,7 +288,7 @@ git push origin sua-nova-branch
 
 Seguir este processo garante que as alterações sejam revisadas adequadamente e que a `main` permaneça estável.
 
-## Revisão
+## 6.2. Revisão
 
 Durante a revisão do PR, siga essas políticas:
 
@@ -266,7 +301,7 @@ Durante a revisão do PR, siga essas políticas:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# Versionamento
+# 7. Versionamento
 
 Este projeto segue a especificação [SemVer](https://semver.org/). O release é manual: o workflow [`_release.yaml`](.github/workflows/_release.yaml) roda o semantic-release na `main`, cria a tag e atualiza o [CHANGELOG.md](CHANGELOG.md).
 

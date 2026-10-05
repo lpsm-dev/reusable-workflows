@@ -40,10 +40,13 @@ A config do Gitleaks fica no repositório que chama, e não aqui. Cada projeto e
 O repositório precisa ter uma config do Gitleaks. O caminho padrão é `.github/config/.gitleaks.toml`. Para começar, copie um dos templates de [`templates/gitleaks/`](../../templates/gitleaks/):
 
 ```bash
+SHA="$(git ls-remote https://github.com/lpsm-dev/reusable-workflows refs/heads/main | cut -f1)"
 mkdir -p .github/config
 curl -fsSL -o .github/config/.gitleaks.toml \
-  https://raw.githubusercontent.com/lpsm-dev/reusable-workflows/<sha-completo>/templates/gitleaks/default.toml
+  "https://raw.githubusercontent.com/lpsm-dev/reusable-workflows/${SHA}/templates/gitleaks/default.toml"
 ```
+
+O primeiro comando pega o SHA atual da `main`. Para usar outro commit, atribua o SHA completo dele a `SHA`.
 
 ## 2.2. Exemplo
 

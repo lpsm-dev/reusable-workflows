@@ -40,10 +40,13 @@ Config para o reusable workflow do Gitleaks, documentado em [`docs/workflows/git
 | [`gitleaks/azsk.toml`](gitleaks/azsk.toml) | Regras padrão mais 39 regras de credenciais do AzSK (Azure DevOps), com allowlists para reduzir falso positivo. |
 
 ```bash
+SHA="$(git ls-remote https://github.com/lpsm-dev/reusable-workflows refs/heads/main | cut -f1)"
 mkdir -p .github/config
 curl -fsSL -o .github/config/.gitleaks.toml \
-  https://raw.githubusercontent.com/lpsm-dev/reusable-workflows/<sha-completo>/templates/gitleaks/default.toml
+  "https://raw.githubusercontent.com/lpsm-dev/reusable-workflows/${SHA}/templates/gitleaks/default.toml"
 ```
+
+O primeiro comando pega o SHA atual da `main`. Para usar outro commit, atribua o SHA completo dele a `SHA`.
 
 Os dois arquivos carregam no Gitleaks 8.23.3, a versão que o workflow instala.
 

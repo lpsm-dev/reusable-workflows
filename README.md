@@ -173,15 +173,16 @@ jobs:
 
 ## 3.4. Copiando um template
 
-Baixe o arquivo do commit que você escolheu e commite no seu repositório:
+Baixe o arquivo de um commit fixo e commite no seu repositório:
 
 ```bash
+SHA="$(git ls-remote https://github.com/lpsm-dev/reusable-workflows refs/heads/main | cut -f1)"
 mkdir -p .github/config
 curl -fsSL -o .github/config/.gitleaks.toml \
-  https://raw.githubusercontent.com/lpsm-dev/reusable-workflows/<sha-completo>/templates/gitleaks/default.toml
+  "https://raw.githubusercontent.com/lpsm-dev/reusable-workflows/${SHA}/templates/gitleaks/default.toml"
 ```
 
-A partir daí o arquivo é seu. Mudanças futuras no template não chegam sozinhas na sua cópia.
+O primeiro comando pega o SHA atual da `main`. Para usar outro commit, atribua o SHA completo dele a `SHA`. A partir daí o arquivo é seu. Mudanças futuras no template não chegam sozinhas na sua cópia.
 
 ## 3.5. Fixando a versão pelo SHA
 
