@@ -101,27 +101,24 @@ Um workflow compartilhado roda no pipeline de todo repositório que o chama, com
 
 | Risco | Como este repositório aplica |
 | --- | --- |
-| [CICD-SEC-1: Insufficient Flow Control Mechanisms](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-01-Insufficient-Flow-Control-Mechanisms) | Mudanças entram na `main` por pull request com squash. Quem chama fixa um SHA, então nada daqui chega a outro pipeline sem um pull request lá trocando o SHA. O release só roda na `main`, por disparo manual. |
+| [CICD-SEC-1: Insufficient Flow Control Mechanisms](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-01-Insufficient-Flow-Control-Mechanisms) | Um ruleset na `main` só aceita mudança por pull request com squash, com os checks `scan / scan`, `Action Lint` e `YAML Lint` verdes e a branch atualizada, e bloqueia force push e exclusão, sem exceção para ninguém. Quem chama fixa um SHA, então nada daqui chega a outro pipeline sem um pull request lá trocando o SHA. O release só roda na `main`, por disparo manual, e não faz commit: cria a tag e o GitHub Release. |
 | [CICD-SEC-2: Inadequate Identity and Access Management](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-02-Inadequate-Identity-And-Access-Management) | Os reusable workflows não recebem credenciais. O `aws-cloudfront-deploy` e o `aws-eks-deploy` assumem uma role via OIDC, com credencial temporária, em vez de usar chave de acesso fixa. |
-| [CICD-SEC-3: Dependency Chain Abuse](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-03-Dependency-Chain-Abuse) | Actions de terceiros são fixadas pelo SHA completo, e quem chama fixa este repositório da mesma forma, como explica [Fixando a versão pelo SHA](#44-fixando-a-versão-pelo-sha). |
+| [CICD-SEC-3: Dependency Chain Abuse](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-03-Dependency-Chain-Abuse) | Toda action de terceiros, nos workflows e nas composite actions, é fixada pelo SHA completo, com a versão num comentário. Quem chama fixa este repositório da mesma forma, como explica [Fixando a versão pelo SHA](#44-fixando-a-versão-pelo-sha). |
 | [CICD-SEC-4: Poisoned Pipeline Execution](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-04-Poisoned-Pipeline-Execution) | Nenhum workflow usa `pull_request_target`, e os reusable workflows só respondem a `workflow_call`. Inputs entram nos scripts por `env:`, e não por `${{ }}` dentro do `run:`. |
-| [CICD-SEC-5: Insufficient PBAC](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-05-Insufficient-PBAC) | Todo workflow declara `permissions`. Os reusable workflows públicos só leem o repositório, e escrita aparece só nos internos que precisam dela: o release e o lint. |
-| [CICD-SEC-6: Insufficient Credential Hygiene](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-06-Insufficient-Credential-Hygiene) | O checkout usa `persist-credentials: false` quando o job não faz push, o Gitleaks mascara o segredo com `--redact`, e todo push e pull request deste repositório passa pelo scan de segredos. |
-| [CICD-SEC-7: Insecure System Configuration](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-07-Insecure-System-Configuration) | Os jobs rodam em runners hospedados pelo GitHub, descartados ao fim de cada execução, com `timeout-minutes`. |
+| [CICD-SEC-5: Insufficient PBAC](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-05-Insufficient-PBAC) | Todo workflow declara `permissions`, e o token padrão do repositório é só leitura. Escrita aparece só no release, que precisa criar a tag e o GitHub Release. |
+| [CICD-SEC-6: Insufficient Credential Hygiene](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-06-Insufficient-Credential-Hygiene) | Todo checkout usa `persist-credentials: false`, o Gitleaks mascara o segredo com `--redact`, e todo push e pull request deste repositório passa pelo scan de segredos. |
+| [CICD-SEC-7: Insecure System Configuration](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-07-Insecure-System-Configuration) | Os jobs rodam em runners hospedados pelo GitHub, descartados ao fim de cada execução, e todos têm `timeout-minutes`. |
 | [CICD-SEC-8: Ungoverned Usage of 3rd Party Services](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-08-Ungoverned-Usage-of-3rd-Party-Services) | Os workflows não mandam código nem token para serviços externos: o Gitleaks roda no runner e o resultado fica no log. Apps instalados no repositório, como o CodeRabbit, têm acesso por fora do pipeline e precisam ser revisados nas configurações do repositório, em GitHub Apps. |
-| [CICD-SEC-9: Improper Artifact Integrity Validation](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-09-Improper-Artifact-Integrity-Validation) | O binário do Gitleaks só é instalado se o SHA256 bater com o valor fixado no workflow. |
-| [CICD-SEC-10: Insufficient Logging and Visibility](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-10-Insufficient-Logging-And-Visibility) | Uma falha aparece no log do job e derruba a execução. O step `Scan` do Gitleaks registra qual config usou. |
+| [CICD-SEC-9: Improper Artifact Integrity Validation](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-09-Improper-Artifact-Integrity-Validation) | Os binários do Gitleaks e do actionlint só são instalados se o SHA256 bater com o valor fixado no workflow. |
+| [CICD-SEC-10: Insufficient Logging and Visibility](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-10-Insufficient-Logging-And-Visibility) | Nenhuma verificação usa `continue-on-error`: uma falha aparece no log e derruba o job. O step `Scan` do Gitleaks registra qual config usou. |
 
 ## 2.2. Pendências conhecidas
 
 O que ainda não segue a tabela acima:
 
-- A `main` não tem proteção de branch nem ruleset. A revisão por pull request é prática, não regra (CICD-SEC-1).
-- O token padrão do repositório tem permissão de escrita, qualquer action pode rodar, e a exigência de SHA nas actions (`sha_pinning_required`) está desligada. Os workflows daqui declaram `permissions`, mas o padrão deveria ser só leitura (CICD-SEC-3, CICD-SEC-5 e CICD-SEC-7).
-- O `_check-workflows.yaml`, o `_release.yaml`, o `aws-cloudfront-deploy` e o `aws-eks-deploy` referenciam actions por tag (`@v4`, `@v1`), e não por SHA (CICD-SEC-3).
-- As composite actions de AWS interpolam `${{ inputs.* }}` dentro do `run:` (CICD-SEC-4).
-- No `_check-workflows.yaml`, o actionlint roda com `continue-on-error: true` e nunca falha o build, e o checkout não usa `persist-credentials: false` (CICD-SEC-6 e CICD-SEC-10).
-- O `_release.yaml` pede `id-token: write` sem usar, não tem `timeout-minutes` e instala pacotes npm que não usa (`@semantic-release/gitlab`, `@semantic-release/npm`, `@semantic-release/exec` e o commitlint), fixados por versão mas sem lockfile (CICD-SEC-3, CICD-SEC-5 e CICD-SEC-7).
+- O ruleset exige pull request e CI verde, mas não aprovação de outra pessoa, porque o repositório tem um mantenedor só (CICD-SEC-1).
+- A exigência de SHA nas actions (`sha_pinning_required`) está desligada, e qualquer action pode rodar. Agora que tudo está fixado por SHA, a exigência pode ser ligada nas configurações do repositório (CICD-SEC-3 e CICD-SEC-8).
+- O `_release.yaml` instala os pacotes npm por versão, sem lockfile, então as dependências transitivas não ficam fixadas. O Node também vem de `lts/*`, sem versão fixa (CICD-SEC-3).
 
 ## 2.3. No seu pipeline
 
@@ -238,7 +235,7 @@ Gostaria de contribuir? Isso é ótimo! Temos um guia de contribuição para te 
 
 # 7. Versionamento
 
-Para verificar o histórico de mudanças, acesse o arquivo [**CHANGELOG.md**](CHANGELOG.md).
+As notas de cada versão ficam nos [GitHub Releases](https://github.com/lpsm-dev/reusable-workflows/releases). O [**CHANGELOG.md**](CHANGELOG.md) guarda o histórico até a versão 1.0.0.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

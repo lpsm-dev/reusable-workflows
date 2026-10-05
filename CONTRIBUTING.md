@@ -150,7 +150,7 @@ Todo workflow e toda action, novos ou alterados, seguem o [OWASP Top 10 CI/CD Se
 - **Runner (CICD-SEC-7):** use runners hospedados pelo GitHub e defina `timeout-minutes` em todo job.
 - **Serviços externos (CICD-SEC-8):** não mande código, token ou relatório para serviço de fora sem uma decisão registrada em ADR.
 - **Visibilidade (CICD-SEC-10):** falha tem que aparecer. Não use `continue-on-error` em verificação, e registre no log as escolhas que mudam o comportamento, como a config usada pelo Gitleaks.
-- **Fluxo (CICD-SEC-1):** toda mudança entra por pull request revisado, e quem chama só recebe a mudança quando troca o SHA.
+- **Fluxo (CICD-SEC-1):** toda mudança entra por pull request com CI verde, como exige o ruleset da `main`, e quem chama só recebe a mudança quando troca o SHA.
 
 O README lista as [pendências conhecidas](README.md#22-pendências-conhecidas) do repositório em relação a esses itens. Ao corrigir uma delas, tire-a da lista no mesmo pull request.
 
@@ -292,7 +292,7 @@ git push origin sua-nova-branch
 - Revisão e aprovação:
   - Um mantenedor revisará seu código.
   - Se o código atender aos requisitos e padrões, ele será aprovado.
-  - Após a aprovação, o PR é mesclado na `main` com squash.
+  - Com o CI verde, o PR é mesclado na `main` com squash. O ruleset da `main` bloqueia push direto e outros tipos de merge.
 
 - Finalização:
   - Após a mesclagem, apague a sua branch se ela não for mais necessária.
@@ -307,7 +307,7 @@ Durante a revisão do PR, siga essas políticas:
 - Seja respeitoso e construtivo.
 - Sempre realize a revisão em pares.
 - Sugira alterações em vez de simplesmente comentar os problemas encontrados.
-- Exigimos pelo menos um aprovador no PR, que não seja o autor.
+- Com mais de um mantenedor, exija pelo menos um aprovador que não seja o autor. Hoje o ruleset da `main` exige pull request e CI verde, mas não aprovação, porque o repositório tem um mantenedor só.
 - Se não tiver certeza sobre algo, pergunte ao autor do PR.
 - Se você estiver satisfeito com as alterações, aprove o PR.
 
@@ -315,7 +315,7 @@ Durante a revisão do PR, siga essas políticas:
 
 # 8. Versionamento
 
-Este projeto segue a especificação [SemVer](https://semver.org/). O release é manual: o workflow [`_release.yaml`](.github/workflows/_release.yaml) roda o semantic-release na `main`, cria a tag e atualiza o [CHANGELOG.md](CHANGELOG.md).
+Este projeto segue a especificação [SemVer](https://semver.org/). O release é manual: o workflow [`_release.yaml`](.github/workflows/_release.yaml) roda o semantic-release na `main` e cria a tag e o GitHub Release com as notas da versão. Ele não faz commit na `main`, então o [CHANGELOG.md](CHANGELOG.md) guarda só o histórico até a versão 1.0.0.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <!-- END_DOCS -->
