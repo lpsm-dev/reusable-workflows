@@ -1,9 +1,10 @@
 <!-- BEGIN_DOCS -->
-<a name="readme-top"></a>
 
 [◀ Voltar](README.md)
 
 <div align="center">
+
+<a name="readme-top"></a>
 
 <img alt="contributing" src="https://github.com/lpsm-dev/lpsm-dev/blob/98272299ea611ba50254b132490ea385149dc5cf/.github/assets/contributing.png" width="225"/>
 
@@ -11,174 +12,149 @@
 
 </div>
 
-Seja bem-vindo e obrigado por considerar contribuir com este projeto! Ler e seguir nossas diretrizes vai te ajudar a entrar com mais rapidez em nosso fluxo de trabalho, além tornar o processo de contribuição mais fácil e eficaz. Contamos com seu apoio!
+Seja bem-vindo e obrigado por considerar contribuir com este projeto! Ler e seguir nossas diretrizes vai te ajudar a entrar com mais rapidez no nosso fluxo de trabalho, além de tornar o processo de contribuição mais fácil e eficaz. Contamos com seu apoio!
 
-# Summary
+<!-- START_TABLE_OF_CONTENTS -->
 
-- [Summary](#summary)
-- [Práticas](#práticas)
-- [Setup](#setup)
-  - [DevBox](#devbox)
-  - [Direnv](#direnv)
-  - [Task](#task)
-- [Commit Messages](#commit-messages)
-  - [Type](#type)
-  - [Scope](#scope)
-  - [Description](#description)
-- [MR Process](#mr-process)
-  - [Steps](#steps)
-  - [Reviewing](#reviewing)
-- [Versioning Process](#versioning-process)
+[1. Práticas](#1-práticas)<br>
+&nbsp;&nbsp;&nbsp;[1.1. Geral](#11-geral)<br>
+&nbsp;&nbsp;&nbsp;[1.2. Comunicação](#12-comunicação)<br>
+[2. Setup](#2-setup)<br>
+&nbsp;&nbsp;&nbsp;[2.1. Devbox](#21-devbox)<br>
+&nbsp;&nbsp;&nbsp;[2.2. Direnv](#22-direnv)<br>
+&nbsp;&nbsp;&nbsp;[2.3. Task](#23-task)<br>
+[3. Adicionando componentes](#3-adicionando-componentes)<br>
+&nbsp;&nbsp;&nbsp;[3.1. Reusable workflow](#31-reusable-workflow)<br>
+&nbsp;&nbsp;&nbsp;[3.2. Composite action](#32-composite-action)<br>
+&nbsp;&nbsp;&nbsp;[3.3. Template](#33-template)<br>
+&nbsp;&nbsp;&nbsp;[3.4. Workflow interno](#34-workflow-interno)<br>
+[4. Padrão de documentação](#4-padrão-de-documentação)<br>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# Práticas
+<!-- END_TABLE_OF_CONTENTS -->
 
-**Geral**
+# 1. Práticas
+
+## 1.1. Geral
 
 - Se você não conseguir continuar uma tarefa, informe imediatamente sua equipe. A comunicação rápida evita atrasos e permite que outras pessoas te ajudem a resolver os problemas com mais rapidez.
 - Não reinvente a roda. Se você pesquisou e viu que já existe uma solução bem estabelecida para o seu problema, use-a. Isso economiza tempo e recurso.
 
-**Comunicação**
+## 1.2. Comunicação
 
 - Minimize o uso de IA na comunicação diária com a equipe. Valorizamos interações reais e genuínas.
-- Seja objetivo na sua comunição quando precisa de ajuda (isso não significa ser rude rsrs).
+- Seja objetivo na sua comunicação quando precisar de ajuda (isso não significa ser rude rsrs).
 - A comunicação assíncrona é uma grande aliada para equipes remotas. Para mais detalhes, clique [aqui](https://nohello.net/en/).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# Setup
+# 2. Setup
 
-Para você começar a contribuir, é essencial configurar seu ambiente de trabalho local:
+As ferramentas de linha de comando deste repositório (`actionlint`, `yamllint`, `gitleaks`, `task`, `pre-commit` e `act`) estão declaradas no [devbox.json](devbox.json). As etapas abaixo deixam tudo pronto em poucos comandos.
 
-- **Instalar ferramentas**: Certifique-se de ter instalado todas as ferramentas de linha de comando que o projeto requer.
-- **Configurar variáveis de ambiente**: Ajuste as variáveis de ambiente para garantir que seu sistema esteja preparado para rodar o projeto.
-- **Executar scripts de automação**: Rode os scripts fornecidos para configurar dependências, inicializar bancos de dados e outras tarefas automatizadas.
+## 2.1. Devbox
 
-> [!NOTE]  
-> Lembre-se: cada projeto tem seu próprio contexto e necessidades!
->
+O **Devbox** é uma ferramenta CLI que cria ambientes de desenvolvimento isolados e reproduzíveis, sem precisar usar containers Docker ou a linguagem Nix de forma nativa.
 
-Pensando nisso, elaboramos as etapas abaixo para te guiar.
-
-## DevBox
-
-O **DevBox** é uma ferramenta CLI que cria ambientes de desenvolvimento isolados e reproduzíveis, sem precisar usar containers Docker ou a linguagem Nix de forma nativa.
-
-> [!NOTE]  
+> [!NOTE]
 > Use essa opção se você não quiser instalar muitas ferramentas CLI diretamente em seu ambiente de trabalho.
->
 
-Siga essas etapas para configurar seu ambiente:
-
-- Instale o [devbox](https://www.jetify.com/devbox/docs/installing_devbox/):
+- Instale o [devbox](https://www.jetify.com/docs/devbox/installing-devbox):
 
 ```bash
-curl -fsSL <https://get.jetpack.io/devbox> | bash
+curl -fsSL https://get.jetify.com/devbox | bash
 ```
 
-- Inicialize seu projeto:
-
-```bash
-devbox init
-```
-
-- Adicione os pacotes que deseja (vai mudar de projeto para projeto). Ex:
-
-```json
-{
-  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.10.7/.schema/devbox.schema.json",
-  "packages": [
-    "awscli2@latest",
-    "kubectl@1.29.3",
-    "kubernetes-helm@3.14.3"
-  ],
-  "shell": {
-    "init_hook": [
-      "echo 'Welcome to devbox!' > /dev/null"
-    ],
-    "scripts": {
-      "test": [
-        "echo \"Error: no test specified\" && exit 1"
-      ]
-    }
-  }
-}
-```
-
-- Execute o seguinte comando para inicializar o shell temporário:
+- Na raiz do repositório, abra o shell com as ferramentas do projeto:
 
 ```bash
 devbox shell
 ```
 
-Com isso, podemos garantir que todos no projeto tenham as mesmas ferramentas nas mesmas versões, necessárias para o processo de desenvolvimento.
+Com isso, todos no projeto usam as mesmas ferramentas, nas mesmas versões.
 
-> [!NOTE]  
-> Se você precisar de mais detalhes sobre essa configuração, verifique o arquivo [devbox.json](devbox.json) do seu projeto. Caso não exista, crie ele seguindo o passo a passo descrito acima.
->
+## 2.2. Direnv
 
-## Direnv
-
-Para você automatizar certas ações em seu terminal sempre que você for trabalhar nesse projeto, configure o **Direnv**. Essa ferramenta vai ajustar o seu shell conforme o seu diretório atual. Assim, sempre que você entrar na pasta do projeto, o **Direnv** fará algo, como: carregará as variáveis definidas no `.env` ou disparar o shell do **DevBox**.
-
-Siga essas etapas para configurar seu ambiente:
+O **Direnv** ajusta o seu shell conforme o diretório atual. Neste repositório, o [.envrc](.envrc) abre o shell do **Devbox** sempre que você entra na pasta do projeto.
 
 - Acesse a documentação do [direnv](https://direnv.net/docs/installation.html) e siga as instruções para instalá-lo.
-
-- Após a instalação, crie um arquivo `.env` na raiz do seu projeto para armazenar as variáveis de ambiente utilizadas.
-
-- Crie o arquivo `.envrc` com o seguinte conteúdo:
-
-```bash
-# Dotenv Support
-[[ ! -f .env ]] || dotenv .env
-
-# Devbox Support
-has devbox && eval "$(devbox generate direnv --print-envrc)" && exit 0
-```
-
-- A primeira vez que você criar ou modificar um arquivo `.envrc`, você precisará autorizá-lo com o comando:
+- Na primeira vez que entrar na pasta, e sempre que o `.envrc` mudar, autorize o arquivo:
 
 ```bash
 direnv allow
 ```
 
-Seguindo essas etapas, quando você navegar para a pasta do seu projeto, as variáveis de ambiente serão carregadas automaticamente e o **DevBox** será inicializado.
+## 2.3. Task
 
-> [!NOTE]  
-> Se você precisar de mais detalhes sobre esse configuração, verifique o arquivo [.envrc](.envrc) do seu projeto.
->
+A ferramenta **task** define e executa as tarefas do projeto, de forma parecida com o `make`. Ela já vem no **Devbox**. Se preferir instalar à parte, siga a documentação do [task](https://taskfile.dev/installation/).
 
-## Task
+Execute `task` na raiz do repositório para listar os comandos. Os mais usados:
 
-A ferramenta **task** oferece uma maneira conveniente de definir e gerenciar tarefas específicas do projeto, facilitando a automatização de scripts comuns e simplificando os fluxos de trabalho de desenvolvimento.
-
-> [!NOTE]  
-> É semelhante à ferramenta `make`, que é utilizada principalmente para automatizar tarefas.
->
-
-Siga essas etapas para configurar seu ambiente:
-
-- Certifique-se de que você instalou o comando `task` seguindo as etapas de configuração do **DevBox**.
-  - Caso não tenha seguido, acesse a documentação do [task](https://taskfile.dev/installation/) e siga as instruções para instalá-lo.
-- Execute o comando `task` no diretório raiz do projeto para ver todos os comandos disponíveis.
-
-> [!NOTE]  
-> Se você precisar de mais detalhes sobre cada tarefa definida, verifique o arquivo [Taskfile.yaml](Taskfile.yaml) do seu projeto. Caso não exista, crie ele seguindo o passo a passo descrito acima.
->
+| Comando | O que faz |
+| --- | --- |
+| `task precommit:init` | Instala os hooks do pre-commit, incluindo a validação da mensagem de commit |
+| `task yamllint` | Valida os arquivos YAML com a config de `.github/config/.yamllint.yaml` |
+| `task github:action:lint` | Roda o `actionlint` nos workflows |
+| `task github:action:docs` | Gera o `README.md` de cada composite action a partir do `action.yaml` |
+| `task gitleaks` | Procura segredos com a config de `.github/config/.gitleaks.toml` |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# Commit Messages
+# 3. Adicionando componentes
+
+Antes de criar algo, veja em [Estrutura do repositório](README.md#12-estrutura-do-repositório) onde cada tipo de peça fica.
+
+## 3.1. Reusable workflow
+
+1. Crie o arquivo direto em `.github/workflows/`, sem subpasta e sem `_` no início do nome, por exemplo `.github/workflows/terraform-plan.yaml`. O GitHub não encontra reusable workflows em subpastas.
+2. Use `on: workflow_call` como único gatilho e declare `permissions` mínimas.
+3. Fixe toda action de terceiros pelo SHA completo, com a versão num comentário (`# v7.0.1`).
+4. Escreva a página do workflow em `docs/workflows/<nome>.md`, seguindo o modelo de [`docs/workflows/gitleaks.md`](docs/workflows/gitleaks.md).
+5. Adicione uma linha na tabela de [reusable workflows](README.md#21-reusable-workflows) do README.
+6. Teste antes do merge. Se o workflow fizer sentido para este repositório, chame-o no [`_ci.yaml`](.github/workflows/_ci.yaml) pelo caminho relativo (`uses: ./.github/workflows/<nome>.yaml`), que roda a versão do próprio branch. Se não fizer, chame-o de um repositório de teste apontando para o SHA do seu branch.
+
+> [!WARNING]
+> Dentro de um reusable workflow, o contexto `github` é o do repositório que chama. Um `uses: ./actions/<nome>` procura a action no workspace, que tem o código de quem chama, e não o deste repositório. Para usar uma composite action daqui, referencie `lpsm-dev/reusable-workflows/actions/<nome>@<sha-completo>`.
+
+## 3.2. Composite action
+
+1. Crie `actions/<nome>/action.yaml` com `runs.using: composite`. Use kebab-case e comece o nome pelo provedor ou pela ferramenta, como em `aws-ecr-create`.
+2. Passe inputs para scripts via `env:` em vez de interpolar `${{ inputs.<nome> }}` direto no `run:`. Interpolação direta abre espaço para [injeção de script](https://docs.github.com/en/actions/reference/security/secure-use#good-practices-for-mitigating-script-injection-attacks).
+3. Rode `task github:action:docs`. A task cria o `actions/<nome>/README.md` com os marcadores do action-docs e gera descrição, entradas e exemplo de uso a partir do `action.yaml`.
+4. Adicione uma linha no [catálogo de actions](actions/README.md#2-catálogo) e na tabela de [composite actions](README.md#22-composite-actions) do README.
+
+## 3.3. Template
+
+1. Crie o arquivo em `templates/<ferramenta>/<variante>.<extensão>`, por exemplo `templates/gitleaks/default.toml`.
+2. Valide o arquivo com a mesma versão da ferramenta que os workflows usam. Para o Gitleaks, por exemplo: `gitleaks detect --no-git --source . --config templates/gitleaks/<variante>.toml`.
+3. Documente em [`templates/README.md`](templates/README.md) para onde copiar e quando usar, e adicione uma linha na tabela de [templates](README.md#23-templates) do README.
+
+## 3.4. Workflow interno
+
+Automação que serve só a este repositório, como CI e release, fica em `.github/workflows/` com `_` no início do nome: `_ci.yaml` (Gitleaks), `_check-workflows.yaml` (actionlint e yamllint) e `_release.yaml` (semantic-release). A configuração das ferramentas desses workflows fica em `.github/config/`. Nada de fora deve chamar esses arquivos.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+# 4. Padrão de documentação
+
+- A documentação é escrita em português. Código, nomes de inputs e descrições dentro do `action.yaml` ficam em inglês.
+- Os documentos escritos à mão (READMEs, este guia e as páginas de `docs/workflows/`) seguem o mesmo esqueleto: marcadores `<!-- BEGIN_DOCS -->` e `<!-- END_DOCS -->`, âncora `readme-top`, link "◀ Voltar" para a página de cima (menos no README raiz), seções numeradas (`# 1. Visão Geral`, `## 1.1. Objetivo`) e o link "back to top" no fim de cada seção `#`.
+- O sumário fica entre `<!-- START_TABLE_OF_CONTENTS -->` e `<!-- END_TABLE_OF_CONTENTS -->`. Quem gera o sumário e a numeração das seções é o [gtoc](https://github.com/lpsm-dev/gtoc): escreva os títulos sem número e rode `gtoc generate --number-headings <arquivo>.md`. Links para seções usam a âncora numerada, como `#12-estrutura-do-repositório`.
+- Os `README.md` das composite actions são gerados pelo `task github:action:docs`. Não edite o trecho entre os marcadores `action-docs-all` à mão.
+- ADRs ficam em `docs/adrs/NNNN-<titulo>.md`, com front matter (`status` e `date`) e as seções Contexto, Decisão, Opções consideradas e Consequências.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+# Mensagens de commit
 
 Nesse projeto, exigimos que **todos os commits** sigam um formato específico de mensagem, o [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Com isso, conseguimos:
 
-- **Clareza e Consistência**: As mensagens de commit seguem um formato padrão, facilitando a leitura e a compreensão das mudanças.
-- **Automatização**: Permite a automação de processos, como geração de changelogs, versionamento semântico e lançamentos automáticos.
-- **Rastreamento de Alterações**: Facilita o rastreamento de mudanças ao longo do tempo, tornando mais fácil identificar o que foi modificado e por quê.
-- **Melhoria na Revisão de Código**: Proporciona uma melhor experiência de revisão de código, já que as mudanças são descritas de forma clara e padronizada.
-- **Comunicação Eficaz**: Ajuda a todos os membros da equipe a entenderem rapidamente o contexto e o propósito de cada alteração no código.
+- **Clareza e consistência**: as mensagens de commit seguem um formato padrão, facilitando a leitura e a compreensão das mudanças.
+- **Automatização**: permite automatizar a geração de changelog, o versionamento semântico e os releases.
+- **Rastreamento de alterações**: facilita identificar o que foi modificado ao longo do tempo, e por quê.
+- **Revisão de código**: as mudanças chegam descritas de forma clara e padronizada.
+- **Comunicação**: todos entendem rapidamente o contexto e o propósito de cada alteração.
 
 Veja como é organizado esse formato de commits:
 
@@ -188,56 +164,54 @@ Veja como é organizado esse formato de commits:
 [optional body]
 ```
 
-## Type
+## Tipo
 
 Descreve o tipo de alteração do commit. Temos as seguintes opções:
 
-| Tipo      | Descrição |
-|-----------|-----------|
-| **feat**  | Um novo recurso (adição de um novo componente, fornecimento de novas variantes para um componente existente, etc.). |
-| **fix**   | Uma correção de bug (correção de um problema de estilo, resolução de um bug na API de um componente etc.). Ao atualizar dependências que não sejam de desenvolvimento, marque suas alterações como `fix`. |
-| **docs**  | Alterações somente na documentação. |
-| **style** | Alterações que não afetam o significado do código (espaços em branco, formatação, falta de ponto e vírgula etc.). Não deve ser usado para alterações na interface do usuário, pois essas são alterações significativas; em vez disso, considere usar `feat` ou `fix`. |
+| Tipo | Descrição |
+| --- | --- |
+| **feat** | Um novo recurso (um novo workflow, uma nova action, um input novo em um componente existente etc.). |
+| **fix** | Uma correção de bug. Ao atualizar dependências que não sejam de desenvolvimento, marque suas alterações como `fix`. |
+| **docs** | Alterações somente na documentação. |
+| **style** | Alterações que não afetam o significado do código (espaços em branco, formatação etc.). |
 | **refactor** | Uma alteração de código que não corrige um bug nem adiciona um recurso. |
-| **perf**  | Uma alteração de código que melhora o desempenho. |
-| **test**  | Adição de testes ausentes ou correção de testes existentes. |
+| **perf** | Uma alteração de código que melhora o desempenho. |
+| **test** | Adição de testes ausentes ou correção de testes existentes. |
 | **build** | Alterações que afetam o sistema de build. |
-| **ci**    | Alterações em arquivos e scripts de configuração de CI/CD. |
+| **ci** | Alterações em arquivos e scripts de configuração de CI/CD deste repositório. |
 | **chore** | Outras alterações que não modificam arquivos de origem ou de teste. Use esse tipo ao adicionar ou atualizar dependências de desenvolvimento. |
 | **revert** | Reverte um commit anterior. |
 
-## Scope
+## Escopo
 
-É qualquer coisa que forneça informações adicionais ou que especifique o local de alteração do seu código. Por exemplo `events`, `kafka`, `dockerfile`, `authorization` e etc. Cada tipo (`type`) de commit pode ter um escopo (`scope`) opcional, cabendo a você adicionar ou omitir essa informação. Por exemplo:
+É qualquer coisa que forneça informações adicionais ou que especifique o local da alteração. Neste repositório, o escopo costuma ser o nome do componente, como `gitleaks`, `aws-eks-deploy` ou `templates`. Cada tipo (`type`) de commit pode ter um escopo (`scope`) opcional, e cabe a você adicionar ou omitir essa informação. Por exemplo:
 
+```txt
+feat(gitleaks): add config input
 ```
-feat(login): add route
-```
 
-> [!NOTE]  
-> Use a convenção [PascalCase](https://www.dio.me/articles/camel-case-vs-pascal-case) na hora de definir seu escopo (`scope`).
->
+> [!NOTE]
+> Use letras minúsculas e kebab-case no escopo, como nos commits que já existem: `feat(gitleaks)`, `docs(templates)`, `chore(deps)`.
 
-## Description
+## Descrição
 
-É o campo onde você diz o que foi feito no commit, porém de forma breve. Para isso, recomendamos que:
+É o campo onde você diz o que foi feito no commit, de forma breve. Para isso, recomendamos que:
 
 - Priorize descrições em inglês.
-- Use o imperativo, tempo presente: "change", não "changed" ou "changed".
+- Use o imperativo, no tempo presente: "change", não "changed" nem "changes".
 - Não coloque a primeira letra em maiúscula.
 - Não coloque ponto (.) no final.
 
-> [!NOTE]  
+> [!NOTE]
 > Cada tipo de commit tem um efeito sobre a próxima release que você for lançar.
->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# MR Process
+# Pull requests
 
-Ao criar um MR (merge request), é uma boa ideia definir o seu título seguindo a mesma convenção utilizada nas mensagens de commit. Dessa forma, se seu MR for sofrer um **squash** após a mesclagem, o maintainer poderá usar o título como a mensagem final do commit, criando um histórico formato, enxuto e linear.
+Ao criar um pull request (PR), defina o título seguindo a mesma convenção das mensagens de commit. Como o merge é feito com **squash**, o título do PR vira a mensagem final do commit na `main`, e o histórico fica enxuto e linear.
 
-## Steps
+## Passo a passo
 
 - Crie uma branch a partir da branch `main`:
 
@@ -263,44 +237,38 @@ git commit -m "fix: change the commit"
 git push origin sua-nova-branch
 ```
 
-- Abra uma solicitação de MR:
-  - No GitLab, navegue até o repositório e abra uma nova Merge Request da sua branch para a branch de produção `main`.
+- Abra o PR:
+  - No GitHub, abra um pull request da sua branch para a branch `main`.
   - Adicione uma descrição clara do que foi feito e qualquer informação relevante para a revisão.
   - Defina o título usando commits convencionais.
-  - Marque a opção de remover a branch de origem após a mesclagem.
-  - Marque a opção para squash dos commits.
 
-- Revisão e Aprovação:
+- Revisão e aprovação:
   - Um mantenedor revisará seu código.
   - Se o código atender aos requisitos e padrões, ele será aprovado.
-  - Após a aprovação, seu código será mesclado na branch `main`.
+  - Após a aprovação, o PR é mesclado na `main` com squash.
 
 - Finalização:
-  - Após a mesclagem, sua branch pode ser deletada se não for mais necessária.
-  - Certifique-se de executar o `git pull` na branch `main`.
+  - Após a mesclagem, apague a sua branch se ela não for mais necessária.
+  - Execute `git pull` na branch `main`.
 
-Seguir este processo garante que as alterações sejam revisadas adequadamente e que o código de produção permaneça estável e com qualidade.
+Seguir este processo garante que as alterações sejam revisadas adequadamente e que a `main` permaneça estável.
 
-> [!NOTE]  
-> Se você tiver vários commits em seu PR que resolvem o mesmo problema, **squash os commits**.
->
+## Revisão
 
-## Reviewing
-
-Durante o processo de revisão do MR, siga essas políticas:
+Durante a revisão do PR, siga essas políticas:
 
 - Seja respeitoso e construtivo.
 - Sempre realize a revisão em pares.
 - Sugira alterações em vez de simplesmente comentar os problemas encontrados.
-- Exigimos pelo menos um aprovador no MR, que não seja o autor.
-- Se não tiver certeza sobre algo, pergunte ao autor do MR.
-- Se você estiver satisfeito com as alterações, aprove o MR.
+- Exigimos pelo menos um aprovador no PR, que não seja o autor.
+- Se não tiver certeza sobre algo, pergunte ao autor do PR.
+- Se você estiver satisfeito com as alterações, aprove o PR.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# Versioning Process
+# Versionamento
 
-Este projeto segue a especificação [SemVer](https://semver.org/). Consulte a documentação para obter mais detalhes.
+Este projeto segue a especificação [SemVer](https://semver.org/). O release é manual: o workflow [`_release.yaml`](.github/workflows/_release.yaml) roda o semantic-release na `main`, cria a tag e atualiza o [CHANGELOG.md](CHANGELOG.md).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <!-- END_DOCS -->
