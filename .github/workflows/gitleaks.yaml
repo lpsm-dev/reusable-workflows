@@ -9,10 +9,14 @@ on:
   workflow_call:
     inputs:
       config:
-        description: Path to the Gitleaks config, relative to the caller repository
+        description: >-
+          Path to the Gitleaks config, relative to the caller repository. When
+          empty, .github/config/.gitleaks.toml is used if it exists; otherwise
+          Gitleaks looks for .gitleaks.toml at the repository root and then
+          falls back to its default rules
         required: false
         type: string
-        default: .github/config/.gitleaks.toml
+        default: ""
 
 permissions:
   contents: read
@@ -47,10 +51,20 @@ jobs:
         gitleaks version
     - name: Scan
       env:
-        GITLEAKS_CONFIG: ${{ inputs.config }}
+        CONFIG: ${{ inputs.config }}
       run: |
         set -euo pipefail
-        export root="$(mktemp -d)"
+        root="$(mktemp -d)"
         trap 'rm -rf "$root"' EXIT
         git archive --format=tar HEAD | tar -x -C "$root"
-        gitleaks detect --no-git --source "$root" --redact --no-banner --config "${GITHUB_WORKSPACE}/${GITLEAKS_CONFIG}"
+        if [ -z "$CONFIG" ] && [ -f "${GITHUB_WORKSPACE}/.github/config/.gitleaks.toml" ]; then
+          CONFIG=.github/config/.gitleaks.toml
+        fi
+        args=(detect --no-git --source "$root" --redact --no-banner)
+        if [ -n "$CONFIG" ]; then
+          echo "Using Gitleaks config: $CONFIG"
+          args+=(--config "${GITHUB_WORKSPACE}/${CONFIG}")
+        else
+          echo "No Gitleaks config found, using the default lookup"
+        fi
+        gitleaks "${args[@]}"

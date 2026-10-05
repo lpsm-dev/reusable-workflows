@@ -5,7 +5,7 @@ date: 2026-10-03
 
 # Layout: workflows soltos, composite actions e templates inertes
 
-Complementado pelo [0002](0002-docs-and-templates.md).
+Complementado pelo [0002](0002-docs-and-templates.md). A parte sobre `templates/` foi substituída pelo [0003](0003-remove-templates.md).
 
 ## Contexto
 
