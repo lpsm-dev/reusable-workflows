@@ -11,6 +11,10 @@ updates:
   - /actions/*
   schedule:
     interval: weekly
+  # Waits a week before proposing a new release, so a compromised
+  # version has time to be pulled (zizmor dependabot-cooldown).
+  cooldown:
+    default-days: 7
   commit-message:
     prefix: ci
   groups:
@@ -22,6 +26,10 @@ updates:
   directory: /.github/config/release
   schedule:
     interval: weekly
+  # Waits a week before proposing a new release, so a compromised
+  # version has time to be pulled (zizmor dependabot-cooldown).
+  cooldown:
+    default-days: 7
   commit-message:
     prefix: ci(release)
   groups:
