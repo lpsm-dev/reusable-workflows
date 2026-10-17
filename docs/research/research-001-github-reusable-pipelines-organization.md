@@ -4,25 +4,27 @@ date: 2026-10-17
 
 # Organização de repositórios com pipelines reutilizáveis no GitHub
 
-## 1. Pergunta e método
+## 1. Achados
 
-### 1.1 Pergunta
+### 1.1. Pergunta e método
+
+#### 1.1.1. Pergunta
 
 1. O que a documentação oficial do GitHub recomenda para um repositório que hospeda pipelines reutilizáveis (reusable workflows, custom actions, workflow templates)?
 2. Como 20 repositórios reais da comunidade organizam esses ativos: onde ficam as actions, os reusable workflows e os templates, como versionam e publicam, como documentam e como testam as próprias actions?
 
-### 1.2 Método
+#### 1.1.2. Método
 
 - Fontes primárias apenas: docs.github.com, github.blog, wellarchitected.github.com e o código dos próprios repositórios.
 - Cada repositório foi clonado em modo somente leitura e inspecionado no HEAD da branch padrão. Nenhum script, build ou interpretador vindo desses repositórios foi executado.
 - Critério de seleção: repositório público, com pelo menos um commit nos 90 dias anteriores a 2026-10-17 e com pipelines reutilizáveis como finalidade principal.
 - As contagens são feitas por expressão regular sobre linhas `uses:` e sobre o bloco `permissions:` de nível superior. Elas medem presença, não qualidade. Declarações `permissions` no nível do job não entram na contagem.
 - Fato observado e inferência são separados. Inferências levam o prefixo "Inferência:".
-- Os SHAs da seção 4 são o HEAD observado em 2026-10-17. Eles fixam a evidência no tempo.
+- Os SHAs da seção 1.4 são o HEAD observado em 2026-10-17. Eles fixam a evidência no tempo.
 
-## 2. O que o GitHub recomenda
+### 1.2. O que o GitHub recomenda
 
-### 2.1 Reusable workflows
+#### 1.2.1. Reusable workflows
 
 | Regra | Fonte |
 |---|---|
@@ -34,7 +36,7 @@ date: 2026-10-17
 | As permissões do `GITHUB_TOKEN` só podem ser reduzidas pelo workflow chamado, nunca ampliadas. O runner é sempre avaliado no contexto do chamador. | [Reusing workflow configurations (referência)](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations) |
 | Não existe redirecionamento de nome para actions e reusable workflows quando o repositório é renomeado ou transferido. | [Reusing workflow configurations (referência)](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations) |
 
-### 2.2 Custom actions
+#### 1.2.2. Custom actions
 
 | Regra | Fonte |
 |---|---|
@@ -45,14 +47,14 @@ date: 2026-10-17
 | Evite URLs de API fixas. Use `GITHUB_API_URL` e variáveis equivalentes, para funcionar em GHES. | [Manage custom actions](https://docs.github.com/en/actions/how-tos/create-and-publish-actions/manage-custom-actions) |
 | O README descreve entradas, saídas, secrets, variáveis de ambiente e um exemplo de uso. | [Manage custom actions](https://docs.github.com/en/actions/how-tos/create-and-publish-actions/manage-custom-actions) |
 
-### 2.3 Reusable workflow ou composite action
+#### 1.2.3. Reusable workflow ou composite action
 
 A página conceitual compara os dois. Um composite não pode conter jobs e agrupa os logs de seus passos. Um reusable workflow é um ou mais jobs completos, com runner, permissões e secrets próprios. Composite actions podem ser aninhadas até 10 níveis em um workflow.
 Fonte: [Reusing workflow configurations (conceitos)](https://docs.github.com/en/actions/concepts/workflows-and-actions/reusing-workflow-configurations).
 
-O guia Well-Architected não compara os dois mecanismos (ver 2.11).
+O guia Well-Architected não compara os dois mecanismos (ver 1.2.11).
 
-### 2.4 Workflow templates da organização
+#### 1.2.4. Workflow templates da organização
 
 | Regra | Fonte |
 |---|---|
@@ -61,9 +63,9 @@ O guia Well-Architected não compara os dois mecanismos (ver 2.11).
 | O placeholder `$default-branch` é substituído pela branch padrão do repositório de destino. | [Create workflow templates](https://docs.github.com/en/actions/how-tos/reuse-automations/create-workflow-templates) |
 | A visibilidade do repositório `.github` define quem vê o template. Um template é cópia única, sem vínculo posterior com a origem. | [Reusing workflow configurations (referência)](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations) |
 
-Inferência: como o template é cópia, correções na origem não chegam aos repositórios que já o copiaram. Isso explica por que a comunidade usa templates apenas como ponto de partida e mantém a lógica em reusable workflows (seção 3).
+Inferência: como o template é cópia, correções na origem não chegam aos repositórios que já o copiaram. Isso explica por que a comunidade usa templates apenas como ponto de partida e mantém a lógica em reusable workflows (seção 1.3).
 
-### 2.5 Compartilhar actions e workflows privados
+#### 1.2.5. Compartilhar actions e workflows privados
 
 | Regra | Fonte |
 |---|---|
@@ -72,7 +74,7 @@ Inferência: como o template é cópia, correções na origem não chegam aos re
 | Aviso: colaboradores externos veem logs do workflow chamado indiretamente. O runner recebe um token com escopo, que expira em 1 hora. | [Share with your organization](https://docs.github.com/en/actions/how-tos/reuse-automations/share-with-your-organization) |
 | As opções de Access e de actions permitidas são descritas na página de configurações do repositório. | [Managing GitHub Actions settings for a repository](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository) |
 
-### 2.6 Versionamento e release
+#### 1.2.6. Versionamento e release
 
 | Regra | Fonte |
 |---|---|
@@ -84,7 +86,7 @@ Inferência: como o template é cópia, correções na origem não chegam aos re
 
 Observação: o exemplo da página de release usa uma action que move a tag `v1` por force push. Isso não funciona se a tag pertence a um release imutável (ver as duas últimas linhas da tabela).
 
-### 2.7 Segurança
+#### 1.2.7. Segurança
 
 | Regra | Fonte |
 |---|---|
@@ -102,7 +104,7 @@ Observação: o exemplo da página de release usa uma action que move a tag `v1`
 | A proteção "Require lockfile" aplica o lockfile por política. A página também registra uma política padrão que bloqueia `pull_request_target` em repositórios públicos, com aplicação em 2026-11-02. | [Control workflow execution](https://docs.github.com/en/actions/how-tos/administer/control-workflow-execution) |
 | O roadmap de segurança de 2026 cita lockfiles, secrets com escopo, herança de secrets em reusable workflows, firewall de egress e execução guiada por política. É roadmap, o estado atual de cada item não foi verificado. | [2026 security roadmap](https://github.blog/news-insights/product-news/whats-coming-to-our-github-actions-2026-security-roadmap/) |
 
-### 2.8 Marketplace
+#### 1.2.8. Marketplace
 
 | Regra | Fonte |
 |---|---|
@@ -111,7 +113,7 @@ Observação: o exemplo da página de release usa uma action que move a tag `v1`
 | O repositório deve conter apenas a action. | [Publish in GitHub Marketplace](https://docs.github.com/en/actions/how-tos/create-and-publish-actions/publish-in-github-marketplace) |
 | Reusable workflows não podem ser publicados no Marketplace. Composite actions podem. | [Reusing workflow configurations (referência)](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations) |
 
-### 2.9 Limites dos reusable workflows
+#### 1.2.9. Limites dos reusable workflows
 
 | Limite | Fonte |
 |---|---|
@@ -119,16 +121,16 @@ Observação: o exemplo da página de release usa uma action que move a tag `v1`
 | Até 50 reusable workflows únicos por arquivo de workflow, incluindo as árvores aninhadas. | [Reusing workflow configurations (referência)](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations) |
 | Histórico do limite: antes 4 níveis e 20 workflows; em 2025-11-06 passou a 10 e 50. | [Changelog 2025-11-06](https://github.blog/changelog/2025-11-06-new-releases-for-github-actions-november-2025/) |
 
-### 2.10 Práticas gerais do repositório
+#### 1.2.10. Práticas gerais do repositório
 
 | Regra | Fonte |
 |---|---|
 | Arquivos de community health padrão (CONTRIBUTING, SECURITY, templates de issue) vêm de um repositório `.github` público da organização. A precedência é `.github/`, raiz, `docs/`. Não existe LICENSE padrão herdável. | [Creating a default community health file](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file) |
 | O CODEOWNERS pode ficar em `.github/`, na raiz ou em `docs/`. A última regra que casa vence. Donos precisam de acesso de escrita. O próprio arquivo CODEOWNERS deve ter dono. | [About code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) |
 | Rulesets: até 75 por repositório, em camadas, vence a mais restritiva. Aplicam-se a branches e tags, com listas de bypass. São a alternativa às branch protection rules. | [About rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets) |
-| O README de uma action documenta entradas, saídas e exemplo (ver 2.2). | [Manage custom actions](https://docs.github.com/en/actions/how-tos/create-and-publish-actions/manage-custom-actions) |
+| O README de uma action documenta entradas, saídas e exemplo (ver 1.2.2). | [Manage custom actions](https://docs.github.com/en/actions/how-tos/create-and-publish-actions/manage-custom-actions) |
 
-### 2.11 GitHub Well-Architected
+#### 1.2.11. GitHub Well-Architected
 
 Duas páginas foram lidas. Nenhuma compara composite action com reusable workflow.
 
@@ -138,13 +140,13 @@ Duas páginas foram lidas. Nenhuma compara composite action com reusable workflo
 | Use semver. Aplique uma base de rulesets, CODEOWNERS e Dependabot. Mantenha um repositório índice, Topics, Pages e custom properties. Versione workflows relacionados juntos ou separados conforme o acoplamento. Revise a cada trimestre. | [Scaling Actions reusability](https://wellarchitected.github.com/library/collaboration/recommendations/scaling-actions-reusability/) |
 | Declare `permissions: {}` no nível do workflow e dê permissões por job. Fixe SHA com comentário de versão, ou tag de release imutável. Use OIDC com as claims `sub` e `job_workflow_ref`. Mantenha a lista de actions permitidas como código. | [Actions security](https://wellarchitected.github.com/library/application-security/recommendations/actions-security/) |
 
-Divergência entre fontes: esta página diz que a política de SHA cobre "reusable workflow references". A página de configurações do repositório diz que reusable workflows ainda podem ser referenciados por tag. Esta pesquisa não resolve a divergência (seção 7).
+Divergência entre fontes: esta página diz que a política de SHA cobre "reusable workflow references". A página de configurações do repositório diz que reusable workflows ainda podem ser referenciados por tag. Esta pesquisa não resolve a divergência (seção 1.7).
 
-## 3. Padrões encontrados na comunidade
+### 1.3. Padrões encontrados na comunidade
 
-Os números abaixo vêm da tabela da seção 4 e são detalhados na seção 5.
+Os números abaixo vêm da tabela da seção 1.4 e são detalhados na seção 1.5.
 
-### 3.1 Cinco formas de organizar
+#### 1.3.1. Cinco formas de organizar
 
 | Forma | Repositórios | Característica |
 |---|---|---|
@@ -156,7 +158,7 @@ Os números abaixo vêm da tabela da seção 4 e são detalhados na seção 5.
 
 Os demais (ansible, canonical, actions/starter-workflows) não se encaixam limpamente: ansible é um hub de práticas, canonical combina workflows e actions internas, starter-workflows é um catálogo de templates.
 
-### 3.2 Padrões recorrentes
+#### 1.3.2. Padrões recorrentes
 
 - Reusable workflows planos em `.github/workflows/`, como o GitHub exige. Quando o repositório mistura workflows chamáveis e internos, a separação é por prefixo (`reusable-`, `shared-`, `_`, `self-`) ou só pela presença de `workflow_call`. Não há convenção única.
 - Actions na raiz (`<nome>/action.yml`) ou em `actions/<nome>/`. Namespaces aninhados aparecem em elastic (`aws/auth`).
@@ -166,11 +168,11 @@ Os demais (ansible, canonical, actions/starter-workflows) não se encaixam limpa
 - Templates como cópia de ponto de partida, nunca como mecanismo de reuso. Nextcloud sincroniza as cópias por cron.
 - Slsa-github-generator contraria a recomendação de SHA por exigência do verificador: o chamador deve referenciar `@vX.Y.Z` (README do projeto).
 
-## 4. Os 20 repositórios
+### 1.4. Os 20 repositórios
 
 Os dois blocos de tabela seguem a mesma ordem. O link da coluna Repositório aponta para o caminho principal no SHA observado. O SHA é o HEAD da branch padrão em 2026-10-17.
 
-### 4.1 Estrutura
+#### 1.4.1. Estrutura
 
 | # | Repositório | Branch | SHA observado (HEAD) | Padrão | Reusable workflows | Custom actions | Templates |
 |---|---|---|---|---|---|---|---|
@@ -195,7 +197,7 @@ Os dois blocos de tabela seguem a mesma ordem. O link da coluna Repositório apo
 | 19 | [slsa-framework/slsa-github-generator](https://github.com/slsa-framework/slsa-github-generator/tree/bb91a05077afa6601a3d7538c4cbbdbf0abe7ed9/.github/workflows) | main | `bb91a05077afa6601a3d7538c4cbbdbf0abe7ed9` | Híbrido, builders e generators | 10 | 36 em `actions/<ecossistema>/` mais internas em `.github/actions/` | Não |
 | 20 | [entur/gha-docker](https://github.com/entur/gha-docker/tree/dcdc76ce2d251de20f35a92c566d8fe99036e03e/.github/workflows) | main | `dcdc76ce2d251de20f35a92c566d8fe99036e03e` | Um repositório por domínio | 3 (`lint.yml`, `build.yml`, `push.yml`) | 2 internas em `.github/actions/` | Não |
 
-### 4.2 Versionamento, docs, testes e segurança
+#### 1.4.2. Versionamento, docs, testes e segurança
 
 | # | Repositório | Versionamento | Docs | Testes | Segurança |
 |---|---|---|---|---|---|
@@ -226,7 +228,7 @@ Notas:
 - Dependabot ou Renovate foi observado nos 20 repositórios (arquivo de configuração).
 - O Padrão e o caminho são do HEAD citado. Nada foi verificado sobre o histórico.
 
-### 4.3 Notas por repositório
+#### 1.4.3. Notas por repositório
 
 1. **grafana/shared-workflows.** Monorepo híbrido. A maior parte do valor está nas 38 actions, cada uma com README e versão própria (release-please). O README do projeto manda fixar SHA com comentário `# foo/v1.2.3` e usar caminho relativo para actions irmãs.
 2. **bitwarden/gh-actions.** O prefixo `_` marca os workflows chamáveis (14 de 16), o oposto do prefixo `_` deste repositório. Só 3 tags existem; o consumo interno é por `@main`.
@@ -246,16 +248,16 @@ Notas:
 16. **cloudposse/.github.** Combina templates, workflows `shared-*` e uma action local que verifica a cobertura de pins por SHA. Tags em dois formatos.
 17. **actions/starter-workflows.** Referência oficial de templates. As propriedades ficam em `<categoria>/properties/`, não ao lado do `.yml`.
 18. **actions/reusable-workflows.** Referência oficial de reusable workflows para desenvolver actions. Consumo por `@main`, sem tags.
-19. **slsa-framework/slsa-github-generator.** Exige `@vX.Y.Z` por causa do verificador de proveniência (README do projeto). Isso contraria a recomendação de SHA da seção 2.7 e está registrado no issue 12 do slsa-verifier.
+19. **slsa-framework/slsa-github-generator.** Exige `@vX.Y.Z` por causa do verificador de proveniência (README do projeto). Isso contraria a recomendação de SHA da seção 1.2.7 e está registrado no issue 12 do slsa-verifier.
 20. **entur/gha-docker.** A documentação é gerada por um workflow reutilizável de outro repositório do mesmo grupo (`gha-meta`).
 
 Repositórios vizinhos (`entur/gha-meta`, `gha-terraform`, `gha-helm`, `gha-security`) foram vistos, mas não entram na contagem.
 
-## 5. Convergências e divergências
+### 1.5. Convergências e divergências
 
-As contagens vêm da tabela 4.1 e 4.2 e valem para os 20 repositórios.
+As contagens vêm da tabela 1.4.1 e 1.4.2 e valem para os 20 repositórios.
 
-### 5.1 Convergências
+#### 1.5.1. Convergências
 
 | Tema | Contagem | Quais |
 |---|---|---|
@@ -271,7 +273,7 @@ As contagens vêm da tabela 4.1 e 4.2 e valem para os 20 repositórios.
 | actionlint verificado | 8 de 20 | grafana, bitwarden, elastic, chainguard, Homebrew, smartcontractkit, rapidsai e slsa |
 | zizmor como ferramenta | 6 de 20 | grafana, chainguard, Homebrew, rapidsai, equinor e nextcloud |
 
-### 5.2 Divergências
+#### 1.5.2. Divergências
 
 | Tema | Contagem | Detalhe |
 |---|---|---|
@@ -290,11 +292,11 @@ As contagens vêm da tabela 4.1 e 4.2 e valem para os 20 repositórios.
 
 Leitura (Inferência): os repositórios com mais disciplina de supply chain (grafana, chainguard, Homebrew, equinor) também têm `permissions: {}` ou equivalente, SHA em quase todas as referências e ferramentas de análise. Os que priorizam consumo simples (elastic, jenkins, OpenAstronomy) preferem tag móvel de major.
 
-## 6. Comparação com este repositório
+### 1.6. Comparação com este repositório
 
-Esta seção compara. Ela não propõe mudanças de código. O repositório é `lpsm-dev/reusable-workflows`, no commit `4c3000c33970d51eba3d8493aa9e32e32e8b0dee`. Fatos sobre ele vêm de `README.md`, dos ADRs 001 a 004 em `docs/adrs/` e dos workflows em `.github/workflows/`.
+Esta seção compara. Ela não propõe mudanças de código. O repositório avaliado é este, no commit `4c3000c33970d51eba3d8493aa9e32e32e8b0dee`. Fatos sobre ele vêm de `README.md`, dos ADRs 001 a 004 em `docs/adrs/` e dos workflows em `.github/workflows/`.
 
-### 6.1 Onde já segue o recomendado
+#### 1.6.1. Onde já segue o recomendado
 
 | Prática | Evidência neste repositório | Fonte da regra |
 |---|---|---|
@@ -307,7 +309,7 @@ Esta seção compara. Ela não propõe mudanças de código. O repositório é `
 | Ruleset na branch principal e release sem commit na `main` | ADR 003 | [About rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets) |
 | Lint dos workflows (actionlint e yamllint) | `_check-workflows.yaml` | [Secure use](https://docs.github.com/en/actions/reference/security/secure-use) |
 
-### 6.2 Onde diverge ou não há evidência
+#### 1.6.2. Onde diverge ou não há evidência
 
 | Tema | Este repositório | Referência oficial | Comunidade (de 20) |
 |---|---|---|---|
@@ -324,20 +326,19 @@ Esta seção compara. Ela não propõe mudanças de código. O repositório é `
 | Convenção de prefixo | `_` marca o interno | Sem regra oficial | bitwarden usa `_` para o chamável (oposto); jenkins usa `self-` para o interno |
 | Documentação de workflows | `docs/workflows/<nome>/` com README | Sem regra oficial | equinor usa `docs/workflows/`; grafana põe `.md` ao lado do `.yml`; entur usa `README-<workflow>.md` na raiz |
 
-### 6.3 Inferências
+#### 1.6.3. Inferências
 
 - Inferência: sem Dependabot ou Renovate, os pins por SHA do repositório dependem de atualização manual. Nenhum arquivo de configuração foi encontrado na árvore.
 - Inferência: a política `sha_pinning_required` não cobriria a referência por tag a reusable workflows, então ligar a política não substitui a orientação de SHA que o README dá aos consumidores. O lockfile (public preview desde 2026-10-14) é descrito pela documentação como melhor medida para quem consome, e o texto do README sobre SHA continua válido para quem não o adota.
 - Inferência: a referência `$/` poderia substituir `./.github/workflows/gitleaks.yaml` em `_ci.yaml`. OpenAstronomy e entur chamam o workflow local nos próprios testes, o mesmo padrão. A referência `$/` não existe no GHES.
 - Inferência: a abordagem de smartcontractkit (fonte por componente mais cópia gerada) mostra uma forma de versionar cada workflow à parte apesar da pasta plana, mas só vale a pena se a versão por workflow for necessária. O ADR 001 escolheu uma versão única.
 - Inferência: kubewarden documenta que actions chamadas pelos próprios workflows devem ser atualizadas por SHA antes da tag. O mesmo risco circular existe aqui, onde os workflows internos chamam as composite actions por caminho local.
-- Inferência: `lpsm-dev/.github` não foi encontrado de forma anônima. Pode ser privado ou inexistente, então herança de community health não foi verificada.
 
-## 7. Lacunas
+### 1.7. Lacunas
 
 | Lacuna | Efeito |
 |---|---|
-| As páginas de configuração de Actions em nível de organização e "Disabling or limiting GitHub Actions for your organization" não foram abertas. Só a página do repositório e o trecho da API REST. | A seção 2.7 pode omitir detalhes de políticas de organização. |
+| As páginas de configuração de Actions em nível de organização e "Disabling or limiting GitHub Actions for your organization" não foram abertas. Só a página do repositório e o trecho da API REST. | A seção 1.2.7 pode omitir detalhes de políticas de organização. |
 | O lockfile foi lido na documentação e no changelog, sem teste. Elegibilidade em GHES e planos além do changelog não foi checada. | O estado prático do recurso é não verificado. |
 | O roadmap de segurança de 2026 (secrets com escopo, firewall de egress) é roadmap. | O estado atual de cada item é não verificado. |
 | Imutabilidade de releases, GitHub Releases e listagens no Marketplace dos 20 repositórios não são verificáveis por git. | Só grafana documenta o estado no próprio README. |
@@ -348,13 +349,12 @@ Esta seção compara. Ela não propõe mudanças de código. O repositório é `
 | O Exa atingiu o limite de requisições uma vez. WebSearch foi usado só para localizar URLs, e o conteúdo foi verificado por leitura direta das páginas. | Sem efeito sobre as afirmações citadas. |
 | A opção `directory` do Dependabot para composite actions em subpastas não foi verificada na referência de opções. | Não se afirma nada sobre isso. |
 | A existência de `rapidsai/shared-actions` não foi verificada à parte. | Citada só como informação do README. |
-| `lpsm-dev/.github` não foi encontrado de forma anônima. | Pode ser privado ou inexistente. |
 | Do Well-Architected foram lidas duas páginas. | Outras páginas podem cobrir reuso de Actions. |
 | Ferramentas de release, testes e prefixos de repositórios fora da amostra não foram avaliados. | A amostra tem 20 repositórios, não representa o ecossistema. |
 
-## 8. Fontes
+## 2. Fontes
 
-### 8.1 Documentação do GitHub
+### 2.1. Documentação do GitHub
 
 - [Reuse workflows](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows)
 - [Reusing workflow configurations (referência)](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations)
@@ -378,7 +378,7 @@ Esta seção compara. Ela não propõe mudanças de código. O repositório é `
 - [About code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
 - [About rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets)
 
-### 8.2 GitHub Blog e Well-Architected
+### 2.2. GitHub Blog e Well-Architected
 
 - [Changelog 2025-08-15: policy supports blocking and SHA pinning](https://github.blog/changelog/2025-08-15-github-actions-policy-now-supports-blocking-and-sha-pinning-actions/)
 - [Changelog 2025-10-28: immutable releases GA](https://github.blog/changelog/2025-10-28-immutable-releases-are-now-generally-available/)
@@ -388,10 +388,10 @@ Esta seção compara. Ela não propõe mudanças de código. O repositório é `
 - [Well-Architected: scaling Actions reusability](https://wellarchitected.github.com/library/collaboration/recommendations/scaling-actions-reusability/)
 - [Well-Architected: Actions security](https://wellarchitected.github.com/library/application-security/recommendations/actions-security/)
 
-### 8.3 Repositórios da comunidade
+### 2.3. Repositórios da comunidade
 
-Os 20 repositórios da seção 4, nos SHAs listados na tabela 4.1. Também foram consultados, como contexto oficial, `actions/checkout` (tag móvel `v7`, workflows `update-main-version.yml` e `publish-immutable-actions.yml`), `actions/toolkit` e `actions/typescript-action`.
+Os 20 repositórios da seção 1.4, nos SHAs listados na tabela 1.4.1. Também foram consultados, como contexto oficial, `actions/checkout` (tag móvel `v7`, workflows `update-main-version.yml` e `publish-immutable-actions.yml`), `actions/toolkit` e `actions/typescript-action`.
 
-### 8.4 Repositório avaliado
+### 2.4. Repositório avaliado
 
-`lpsm-dev/reusable-workflows` no commit `4c3000c33970d51eba3d8493aa9e32e32e8b0dee`: `README.md`, `CONTRIBUTING.md`, `docs/adrs/adr-001` a `adr-004`, `.github/workflows/` e `.github/config/.releaserc.json`.
+Este repositório, no commit `4c3000c33970d51eba3d8493aa9e32e32e8b0dee`: `README.md`, `CONTRIBUTING.md`, `docs/adrs/adr-001` a `adr-004`, `.github/workflows/` e `.github/config/.releaserc.json`.

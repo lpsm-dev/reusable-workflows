@@ -3,38 +3,37 @@ status: accepted
 date: 2026-10-17
 ---
 
-# docs/ organizado por tipo de documento, nas regras dos dotfiles
+# docs/ organizado por tipo de documento e config em .github/config
 
 ## 1. Contexto
 
 ### 1.1. Situação atual
 
 O `docs/` tinha três pastas com critérios diferentes:
-- `adrs/` (`NNNN-titulo.md`);
-- `research/` (nome livre);
-- `workflows/<nome>/` (página do workflow e exemplos de config).
+- `adrs/`, com nomes `NNNN-titulo.md`;
+- `research/`, com nome livre;
+- `workflows/<nome>/`, com a página do workflow e exemplos de config.
 
-O local da página do workflow veio do [adr-002](adr-002-docs-and-templates.md) e do [adr-004](adr-004-remove-templates.md).
-
-Os dotfiles do mantenedor já organizam o `docs/` por tipo de documento: uma pasta por tipo, nome `tipo-nnn-titulo.md`, README por pasta e esqueletos em `_templates/`. Este repositório não seguia essa regra.
+O local da página do workflow veio do [adr-002](adr-002-docs-and-templates.md) e do [adr-004](adr-004-remove-templates.md). O CI escaneava o código com `docs/workflows/gitleaks/azsk.toml`, então um arquivo de config real morava dentro de `docs/`.
 
 ### 1.2. Problema
 
-Definir onde cada documento deste repositório mora, com a mesma regra dos dotfiles, sem quebrar o CI nem os links.
+Definir onde cada documento mora, com uma regra única para todos os tipos, e tirar de `docs/` o que não é documento.
 
 ### 1.3. Drivers
 
-- **Uma regra para os repositórios do mantenedor:** quem já conhece o `docs/` dos dotfiles acha o documento aqui sem ler outra convenção.
-- **Pasta é tipo:** `workflows/` é um assunto, não um tipo de documento.
+- **Pasta é tipo:** quem procura uma decisão, uma pesquisa ou uma explicação acha pelo tipo. `workflows/` é um assunto, não um tipo de documento.
+- **Config junto da config:** `.github/config/` guarda a configuração das ferramentas deste repositório. Um arquivo que o CI carrega é config, não exemplo.
+- **Estrutura previsível:** cada tipo tem um esqueleto em `docs/_templates/`.
 
 ### 1.4. Constraints
 
-- Os ADRs aceitos não mudam de decisão. Só nome de arquivo, numeração das seções e links.
-- O CI chama o Gitleaks com o exemplo `azsk.toml`, então o caminho do exemplo muda junto no `_ci.yaml`.
+- Os ADRs aceitos não mudam de decisão. Mudam o nome do arquivo, a estrutura das seções e os links.
+- O CI precisa continuar validando o ruleset do AzSK a cada pull request.
 
 ## 2. Decisão
 
-Decidimos organizar o `docs/` como nos dotfiles, aceitando renomear os ADRs e mover a página do workflow.
+Decidimos organizar o `docs/` por tipo de documento e mover o AzSK para `.github/config/.gitleaks.toml`, aceitando renomear os ADRs e mudar o caminho do exemplo.
 
 | Antes | Depois |
 |---|---|
@@ -45,54 +44,67 @@ Decidimos organizar o `docs/` como nos dotfiles, aceitando renomear os ADRs e mo
 | `adrs/0005-adopt-community-practices.md` | `adrs/adr-005-adopt-community-practices.md` |
 | `research/github-reusable-pipelines-organization.md` | `research/research-001-github-reusable-pipelines-organization.md` |
 | `workflows/gitleaks/README.md` | `handbooks/gitleaks/handbook-001-gitleaks-workflow.md` |
-| `workflows/gitleaks/azsk.toml` | `handbooks/gitleaks/azsk.toml` |
+| `workflows/gitleaks/azsk.toml` | `.github/config/.gitleaks.toml` (fora de `docs/`) |
 
-Os antigos 0003 e 0004 trocam de número. Os dois têm `date: 2026-10-05`, e a regra desempata pelo título: "Release sem commit..." vem antes de "Sem pasta templates...".
+- A regra de nome é `tipo-nnn-titulo.md`, numerada pela `date`. No mesmo dia, desempata o título. Os antigos 0003 e 0004 trocam de número: os dois têm `date: 2026-10-05`, e "Release sem commit..." vem antes de "Sem pasta templates...".
+- Entram `docs/README.md`, um README por pasta, `_assets/`, `_inbox/`, `_templates/`, `rfcs/` e `runbooks/`. Todo documento segue o esqueleto do tipo.
+- O AzSK vira a config do Gitleaks deste repositório. O `_ci.yaml` deixa de passar `config:`, e o workflow acha o arquivo pela busca padrão. O CI passa a exercitar também essa busca.
+- O README de cada composite action continua em `actions/<nome>/`, ao lado do `action.yaml`, porque é gerado a partir dele.
 
-Entram `docs/README.md`, um README por pasta, `_assets/`, `_inbox/`, `_templates/`, `rfcs/` e `runbooks/`. O README de cada composite action continua em `actions/<nome>/`, ao lado do `action.yaml`, porque é gerado a partir dele.
-
-Esta decisão substitui o local da página do workflow definido no adr-002 e no adr-004. O resto dos dois continua valendo.
+Esta decisão substitui o local da página do workflow e do exemplo de config definido no adr-002 e no adr-004. O resto dos dois continua valendo.
 
 ## 3. Opções consideradas
 
-### 3.1. Opção A: tipos dos dotfiles, página do workflow como handbook
+### 3.1. Opção A: tipos de documento e config em `.github/config/`
 
-A página explica o workflow, como as peças se relacionam e para onde seguir. Isso é um handbook. O exemplo de config fica na pasta do assunto.
+A página do workflow explica o que ele é, como as peças se ligam e para onde seguir. Isso é um handbook.
+
+| Prós | Contras |
+|---|---|
+| Uma regra para todo o `docs/` | Muitos arquivos renomeados |
+| Nenhuma config real dentro de `docs/` | O caminho do exemplo muda para quem baixa |
 
 **Adotada**, porque segue a regra sem abrir pasta fora dos tipos.
 
-### 3.2. Opção B: tipos dos dotfiles, mantendo `docs/workflows/`
+### 3.2. Opção B: tipos de documento, mantendo `docs/workflows/`
 
-Menos arquivos movidos e o caminho do `azsk.toml` não muda.
+| Prós | Contras |
+|---|---|
+| Menos arquivos movidos | `workflows/` não é tipo de documento |
+| | A config do CI continua dentro de `docs/` |
 
-**Rejeitada**, porque `workflows/` não é um tipo. A regra lista "reference" e "guide" entre os nomes que não viram pasta.
+**Rejeitada**, porque mantém as duas exceções.
 
 ### 3.3. Opção C: página ao lado do workflow, em `.github/workflows/`
 
-Espelha `actions/<nome>/README.md`, como faz o grafana (pesquisa 001).
+Espelha `actions/<nome>/README.md`, como faz o grafana (research-001).
 
-**Rejeitada**, porque mistura Markdown com os arquivos que o GitHub executa, e o ADR 001 tirou a documentação dessa pasta.
+| Prós | Contras |
+|---|---|
+| Página perto do YAML | Mistura Markdown com os arquivos que o GitHub executa |
+
+**Rejeitada**, porque o adr-001 tirou a documentação dessa pasta.
 
 ## 4. Trade-offs aceitos
 
 | Trade-off | Impacto | Mitigação |
 |---|---|---|
 | Os números 003 e 004 trocam | Uma referência antiga a "ADR 0003" ou "ADR 0004" aponta para outro documento | A tabela da seção 2 registra a troca |
-| O caminho do `azsk.toml` muda | O comando `curl` do handbook usa um SHA. Um SHA antigo continua com o caminho antigo | Quem baixa num SHA novo usa o caminho novo, que já está no handbook |
+| O caminho do AzSK muda | Um SHA antigo continua com o caminho antigo | O handbook usa o caminho novo, válido para SHAs novos |
 
 ## 5. Consequências
 
 ### 5.1. Positivas
 
-- O `docs/` deste repositório e o dos dotfiles têm a mesma regra.
-- Cada tipo tem um esqueleto em `_templates/`.
+- Cada tipo de documento tem uma pasta, um README e um esqueleto.
+- `.github/config/` volta a ser o único lugar de config deste repositório.
 
 ### 5.2. Negativas
 
-- Um workflow novo exige um handbook novo e recalcula a numeração quando a data dele cai antes de outro handbook.
+- Um workflow novo exige um handbook novo. A numeração é recalculada quando a data dele cai antes de outro handbook.
 
 ## 6. Referências
 
-- [adr-002-docs-and-templates.md](adr-002-docs-and-templates.md) e [adr-004-remove-templates.md](adr-004-remove-templates.md): local anterior da página do workflow.
+- [adr-002-docs-and-templates.md](adr-002-docs-and-templates.md) e [adr-004-remove-templates.md](adr-004-remove-templates.md): local anterior da página e do exemplo.
 - [docs/README.md](../README.md): as regras de nome e de tipo.
 - [research-001-github-reusable-pipelines-organization.md](../research/research-001-github-reusable-pipelines-organization.md): como outros repositórios documentam workflows.

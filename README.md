@@ -48,7 +48,7 @@ Hello Human 👽! Bem-vindo ao meu repositório 👋
 
 ## 1.1. Objetivo
 
-Este repositório concentra as peças de GitHub Actions que se repetem entre os meus projetos. Em vez de copiar o mesmo YAML para cada repositório, o projeto chama a peça daqui, fixada em um commit, e só recebe mudanças quando decide atualizar esse commit.
+Este repositório concentra as peças de GitHub Actions que se repetem entre projetos. Em vez de copiar o mesmo YAML para cada repositório, o projeto chama a peça daqui, fixada em um commit, e só recebe mudanças quando decide atualizar esse commit.
 
 Toda peça daqui segue o [OWASP Top 10 CI/CD Security Risks](https://owasp.org/projects/top-10-cicd-security-risks). A seção [Segurança](#2-segurança) mostra como cada risco é tratado e o que ainda falta.
 
@@ -93,7 +93,7 @@ As decisões completas estão nos ADRs, em [`docs/adrs/`](docs/adrs/).
 - **Reusable workflow**: reaproveita um ou mais jobs inteiros. Roda em runner próprio e é chamado no lugar de um job. Exemplo: o scan de segredos com Gitleaks.
 - **Composite action**: reaproveita uma sequência de steps dentro de um job que já existe. Roda no runner e no workspace do job que a chama. Exemplo: publicar arquivos no S3 e invalidar o cache do CloudFront.
 
-E os arquivos de configuração? Cada projeto mantém os seus, como o `.github/config/.gitleaks.toml`. Os workflows daqui funcionam sem config quando a ferramenta tem um padrão razoável, então o projeto só commita um arquivo quando quer personalizar. Exemplos opcionais ficam na pasta do handbook de cada workflow, em `docs/handbooks/<nome>/`.
+E os arquivos de configuração? Cada projeto mantém os seus, como o `.github/config/.gitleaks.toml`. Os workflows daqui funcionam sem config quando a ferramenta tem um padrão razoável, então o projeto só commita um arquivo quando quer personalizar. Exemplos opcionais ficam no handbook de cada workflow, em `docs/handbooks/<nome>/`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -120,7 +120,7 @@ Um workflow compartilhado roda no pipeline de todo repositório que o chama, com
 
 O que ainda não segue a tabela acima:
 
-- O ruleset exige pull request e CI verde, mas não aprovação de outra pessoa, porque o repositório tem um mantenedor só (CICD-SEC-1).
+- O ruleset exige pull request e CI verde, mas não aprovação de outra pessoa, porque não há um segundo revisor (CICD-SEC-1).
 - O repositório exige SHA completo em toda action (`sha_pinning_required`), mas a lista de actions permitidas continua aberta (`allowed_actions: all`): qualquer action fixada por SHA pode rodar (CICD-SEC-8).
 - O semantic-release está fixado na 23.0.0, e o `npm audit` aponta vulnerabilidades em dependências transitivas dessa versão. A atualização chega pelo pull request do Dependabot (CICD-SEC-3).
 - As composite actions não têm teste automatizado. Exercitá-las exige uma conta AWS e uma role OIDC de teste.
