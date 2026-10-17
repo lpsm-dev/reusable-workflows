@@ -5,8 +5,7 @@ on:
   pull_request:
   push:
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: ci-${{ github.repository }}-${{ github.ref }}
@@ -14,6 +13,8 @@ concurrency:
 
 jobs:
   scan:
+    permissions:
+      contents: read
     uses: ./.github/workflows/gitleaks.yaml
     with:
       # The AzSK example doubles as this repository's ruleset, so CI fails if
