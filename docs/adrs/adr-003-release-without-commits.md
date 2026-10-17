@@ -7,26 +7,91 @@ date: 2026-10-05
 
 ## 1. Contexto
 
-O `_release.yaml` rodava o semantic-release com `@semantic-release/changelog` e `@semantic-release/git`, que fazem commit do `CHANGELOG.md` e do `README.md` direto na `main` com o `GITHUB_TOKEN`. A `main` não tinha proteção nem ruleset, então qualquer push chegava nela sem pull request nem CI (CICD-SEC-1).
+### 1.1. Situação atual
 
-Um ruleset que exige pull request bloqueia esse commit do release. Liberar o bot do Actions no ruleset deixaria qualquer workflow com permissão de escrita empurrar código na `main`, que é o cenário que o CICD-SEC-1 e o CICD-SEC-4 tentam evitar.
+O `_release.yaml` rodava o semantic-release com `@semantic-release/changelog` e `@semantic-release/git`. Esses plugins fazem commit do `CHANGELOG.md` e do `README.md` direto na `main` com o `GITHUB_TOKEN`. A `main` não tinha proteção nem ruleset, então qualquer push chegava nela sem pull request nem CI.
+
+### 1.2. Problema
+
+Proteger a `main` com um ruleset sem quebrar o release.
+
+### 1.3. Drivers
+
+- **CICD-SEC-1 (Insufficient Flow Control):** toda mudança na `main` deve passar por pull request com CI verde.
+- **CICD-SEC-4 (Poisoned Pipeline Execution):** nenhum workflow deve conseguir empurrar código na `main`.
+
+### 1.4. Constraints
+
+- Um ruleset que exige pull request bloqueia o commit que o release fazia.
+- Um único mantenedor não consegue aprovar o próprio pull request.
 
 ## 2. Decisão
 
-- O release cria só a tag e o GitHub Release com as notas da versão. Saem `@semantic-release/changelog` e `@semantic-release/git`, e o `CHANGELOG.md` fica como histórico até a versão 1.0.0.
-- A `main` ganha um ruleset sem exceção para ninguém: pull request obrigatório com merge por squash; os checks `scan / scan`, `Action Lint` e `YAML Lint`, emitidos pelo GitHub Actions, verdes e com a branch atualizada; force push e exclusão bloqueados.
-- O ruleset não exige aprovação, porque o repositório tem um mantenedor só e ninguém aprova o próprio pull request.
+Decidimos que o release cria só a tag e o GitHub Release, e que a `main` ganha um ruleset sem exceção, aceitando perder o `CHANGELOG.md` atualizado.
+
+- O release cria a tag e o GitHub Release com as notas da versão. Saem `@semantic-release/changelog` e `@semantic-release/git`. O `CHANGELOG.md` fica como histórico até a versão 1.0.0.
+- A `main` ganha um ruleset sem exceção:
+  - pull request obrigatório com merge por squash;
+  - os checks `scan / scan`, `Action Lint` e `YAML Lint`, emitidos pelo GitHub Actions, verdes e com a branch atualizada;
+  - force push e exclusão bloqueados.
+- O ruleset não exige aprovação, porque ninguém aprova o próprio pull request.
 - O token padrão do repositório passa a ser só leitura. Cada workflow declara as permissões de que precisa.
 
 ## 3. Opções consideradas
 
-- **A (escolhida): release sem commit e ruleset completo.** A `main` só muda por pull request com CI verde.
-- **B (rejeitada): bypass do bot do Actions no ruleset.** Qualquer workflow com escrita passaria a poder alterar a `main`.
-- **C (rejeitada): ruleset parcial, só contra force push e exclusão.** Mantém o release igual, mas push direto continua possível.
-- **D (rejeitada): GitHub App próprio com bypass para manter o commit do changelog.** Exige uma chave privada de longa duração e mais infraestrutura para manter um arquivo que o GitHub Release já cobre.
+### 3.1. Opção A: release sem commit e ruleset completo
 
-## 4. Consequências
+| Prós | Contras |
+|---|---|
+| A `main` só muda por pull request com CI verde | O `CHANGELOG.md` deixa de ser atualizado |
+| Nenhuma credencial nova | |
+
+**Adotada**, porque fecha o CICD-SEC-1 sem exceção no ruleset.
+
+### 3.2. Opção B: bypass do bot do Actions no ruleset
+
+| Prós | Contras |
+|---|---|
+| O release continua igual | Qualquer workflow com escrita passa a poder alterar a `main` |
+
+**Rejeitada**, porque reabre o CICD-SEC-4.
+
+### 3.3. Opção C: ruleset parcial, só contra force push e exclusão
+
+| Prós | Contras |
+|---|---|
+| O release continua igual | Push direto na `main` continua possível |
+
+**Rejeitada**, porque não fecha o CICD-SEC-1.
+
+### 3.4. Opção D: GitHub App próprio com bypass para manter o commit do changelog
+
+| Prós | Contras |
+|---|---|
+| Mantém o `CHANGELOG.md` | Exige chave privada de longa duração e mais infraestrutura |
+
+**Rejeitada**, porque o GitHub Release já cobre o que o arquivo guardava.
+
+## 4. Trade-offs aceitos
+
+| Trade-off | Impacto | Mitigação |
+|---|---|---|
+| Sem aprovação obrigatória | Um pull request entra só com CI verde | Exigir um aprovador quando houver mais de um mantenedor |
+| `CHANGELOG.md` congelado | O histórico novo fica fora do repositório | As notas ficam nos GitHub Releases |
+
+## 5. Consequências
+
+### 5.1. Positivas
 
 - As notas de versão passam a ficar nos GitHub Releases.
-- Todo workflow que precisar alterar a `main` tem que abrir um pull request.
 - Com todas as actions fixadas por SHA, a opção `sha_pinning_required` pode ser ligada nas configurações do repositório.
+
+### 5.2. Negativas
+
+- Todo workflow que precisar alterar a `main` tem que abrir um pull request.
+
+## 6. Referências
+
+- [OWASP Top 10 CI/CD Security Risks](https://owasp.org/projects/top-10-cicd-security-risks).
+- [About rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets).
+- [adr-005-adopt-community-practices.md](adr-005-adopt-community-practices.md): soma o check `Zizmor` e o formato de tag `vX.Y.Z`.

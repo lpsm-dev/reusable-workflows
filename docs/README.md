@@ -1,6 +1,6 @@
 # docs
 
-Índice da documentação deste repositório. A árvore segue as mesmas regras do `docs/` dos dotfiles: a pasta é o tipo do documento.
+Índice da documentação deste repositório. A pasta é o tipo do documento.
 
 A ordem das seções segue o nome: pasta com `_` vem antes das outras.
 
@@ -14,7 +14,9 @@ Um documento responde uma pergunta. A promoção sai da inbox para pesquisa, RFC
 
 Não são pasta: guide, how-to, tutorial, reference, playbook, SOP, policy, archive, project. Por isso a página de cada reusable workflow é um handbook, e não uma pasta `workflows/`. A decisão está em [adrs/adr-006-docs-taxonomy.md](adrs/adr-006-docs-taxonomy.md).
 
-O README de cada composite action fica ao lado do `action.yaml`, em `actions/<nome>/`, porque é gerado a partir dele. Não entra em `docs/`.
+O README de cada composite action fica ao lado do `action.yaml`, em `actions/<nome>/`, porque é gerado a partir dele. Config de ferramenta fica em `.github/config/`. Nenhum dos dois entra em `docs/`.
+
+Todo documento segue o esqueleto do seu tipo, em `_templates/`.
 
 A pasta é o tipo. O frontmatter não repete o tipo. Pesquisa, RFC, ADR, handbook e runbook abrem com `date` (`YYYY-MM-DD`). ADR, RFC e runbook também levam `status`. Inbox não leva frontmatter. Fora: `type`, `id`, `version`, `tags`, `related_docs`, `review_date`. O detalhe está no README de cada pasta.
 
