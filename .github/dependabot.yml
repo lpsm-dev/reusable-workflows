@@ -1,0 +1,30 @@
+---
+# Dependabot keeps the SHA pins and their version comments up to date
+# (OWASP CI/CD, CICD-SEC-3). "/" covers .github/workflows; "/actions/*"
+# covers each composite action.
+version: 2
+
+updates:
+- package-ecosystem: github-actions
+  directories:
+  - /
+  - /actions/*
+  schedule:
+    interval: weekly
+  commit-message:
+    prefix: ci
+  groups:
+    github-actions:
+      patterns:
+      - "*"
+
+- package-ecosystem: npm
+  directory: /.github/config/release
+  schedule:
+    interval: weekly
+  commit-message:
+    prefix: ci(release)
+  groups:
+    semantic-release:
+      patterns:
+      - "*"
