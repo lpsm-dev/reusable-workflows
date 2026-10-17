@@ -26,13 +26,14 @@ jobs:
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
       with:
         node-version: "24.22.0"
-    - name: Copy rules
-      run: |
-        cp .github/config/.releaserc.json .
     - name: Install dependencies
       # package-lock.json pins the transitive dependencies too (CICD-SEC-3).
-      run: npm ci --ignore-scripts --prefix .github/config/release
+      working-directory: .github/config/release
+      run: npm ci --ignore-scripts
     - name: Release
-      run: .github/config/release/node_modules/.bin/semantic-release
+      # semantic-release reads .releaserc.json and resolves its plugins from
+      # the working directory, so it runs next to its lockfile.
+      working-directory: .github/config/release
+      run: ./node_modules/.bin/semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
