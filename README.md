@@ -57,7 +57,10 @@ Toda peça daqui segue o [OWASP Top 10 CI/CD Security Risks](https://owasp.org/p
 ```txt
 .
 ├── .github/
+│   ├── CODEOWNERS           # dono de todos os caminhos
+│   ├── dependabot.yml       # atualização dos SHAs e do lockfile do release
 │   ├── config/              # configuração das ferramentas deste repositório
+│   │   └── release/         # semantic-release: config, package.json e lockfile
 │   ├── taskfiles/           # tasks incluídas pelo Taskfile.yaml
 │   └── workflows/
 │       ├── gitleaks.yaml    # reusable workflow público
@@ -66,7 +69,8 @@ Toda peça daqui segue o [OWASP Top 10 CI/CD Security Risks](https://owasp.org/p
 │   └── <nome>/              # composite action: action.yaml + README.md
 └── docs/
     ├── workflows/<nome>/    # página de cada reusable workflow e exemplos de config
-    └── adrs/                # decisões de arquitetura
+    ├── adrs/                # decisões de arquitetura
+    └── research/            # pesquisas que embasam as decisões
 ```
 
 | Pasta | O que guarda | Quem usa | Como é consumido |
@@ -74,7 +78,7 @@ Toda peça daqui segue o [OWASP Top 10 CI/CD Security Risks](https://owasp.org/p
 | `.github/workflows/` (sem `_`) | Reusable workflows: jobs inteiros, com `on: workflow_call` | Outros repositórios | `jobs.<id>.uses` |
 | `.github/workflows/_*.yaml` | CI e release deste repositório | Só este repositório | Eventos como `push`, `pull_request` e disparo manual |
 | `actions/<nome>/` | Composite actions: sequências de steps | Outros repositórios | `jobs.<id>.steps[*].uses` |
-| `.github/config/` | Configuração das ferramentas usadas aqui (semantic-release e yamllint) | Só este repositório | Lida pelos workflows internos e pelo Taskfile |
+| `.github/config/` | Configuração das ferramentas usadas aqui: yamllint e, em `release/`, o semantic-release com lockfile | Só este repositório | Lida pelos workflows internos e pelo Taskfile |
 | `docs/` | Página de cada reusable workflow, exemplos de config e ADRs | Pessoas | Leitura |
 
 Duas regras do GitHub explicam esse desenho:
@@ -103,9 +107,9 @@ Um workflow compartilhado roda no pipeline de todo repositório que o chama, com
 | --- | --- |
 | [CICD-SEC-1: Insufficient Flow Control Mechanisms](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-01-Insufficient-Flow-Control-Mechanisms) | Um ruleset na `main` só aceita mudança por pull request com squash, com os checks `scan / scan`, `Action Lint` e `YAML Lint` verdes e a branch atualizada, e bloqueia force push e exclusão, sem exceção para ninguém. Quem chama fixa um SHA, então nada daqui chega a outro pipeline sem um pull request lá trocando o SHA. O release só roda na `main`, por disparo manual, e não faz commit: cria a tag e o GitHub Release. |
 | [CICD-SEC-2: Inadequate Identity and Access Management](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-02-Inadequate-Identity-And-Access-Management) | Os reusable workflows não recebem credenciais. O `aws-cloudfront-deploy` e o `aws-eks-deploy` assumem uma role via OIDC, com credencial temporária, em vez de usar chave de acesso fixa. |
-| [CICD-SEC-3: Dependency Chain Abuse](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-03-Dependency-Chain-Abuse) | Toda action de terceiros, nos workflows e nas composite actions, é fixada pelo SHA completo, com a versão num comentário. Quem chama fixa este repositório da mesma forma, como explica [Fixando a versão pelo SHA](#44-fixando-a-versão-pelo-sha). |
-| [CICD-SEC-4: Poisoned Pipeline Execution](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-04-Poisoned-Pipeline-Execution) | Nenhum workflow usa `pull_request_target`, e os reusable workflows só respondem a `workflow_call`. Inputs entram nos scripts por `env:`, e não por `${{ }}` dentro do `run:`. |
-| [CICD-SEC-5: Insufficient PBAC](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-05-Insufficient-PBAC) | Todo workflow declara `permissions`, e o token padrão do repositório é só leitura. Escrita aparece só no release, que precisa criar a tag e o GitHub Release. |
+| [CICD-SEC-3: Dependency Chain Abuse](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-03-Dependency-Chain-Abuse) | Toda action de terceiros, nos workflows e nas composite actions, é fixada pelo SHA completo, com a versão num comentário. O Dependabot abre um pull request semanal para atualizar esses SHAs, e o semantic-release do release é instalado de um lockfile. Quem chama fixa este repositório da mesma forma, como explica [Fixando a versão pelo SHA](#44-fixando-a-versão-pelo-sha). |
+| [CICD-SEC-4: Poisoned Pipeline Execution](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-04-Poisoned-Pipeline-Execution) | Nenhum workflow usa `pull_request_target`, e os reusable workflows só respondem a `workflow_call`. Inputs entram nos scripts por `env:`, e não por `${{ }}` dentro do `run:`. O zizmor audita os workflows e as composite actions em todo push e pull request. |
+| [CICD-SEC-5: Insufficient PBAC](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-05-Insufficient-PBAC) | Todo workflow declara `permissions: {}` no topo, e cada job pede só o que usa. O token padrão do repositório é só leitura. Escrita aparece só no release, que precisa criar a tag e o GitHub Release. |
 | [CICD-SEC-6: Insufficient Credential Hygiene](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-06-Insufficient-Credential-Hygiene) | Todo checkout usa `persist-credentials: false`, o Gitleaks mascara o segredo com `--redact`, e todo push e pull request deste repositório passa pelo scan de segredos. |
 | [CICD-SEC-7: Insecure System Configuration](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-07-Insecure-System-Configuration) | Os jobs rodam em runners hospedados pelo GitHub, descartados ao fim de cada execução, e todos têm `timeout-minutes`. |
 | [CICD-SEC-8: Ungoverned Usage of 3rd Party Services](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-08-Ungoverned-Usage-of-3rd-Party-Services) | Os workflows não mandam código nem token para serviços externos: o Gitleaks roda no runner e o resultado fica no log. Apps instalados no repositório, como o CodeRabbit, têm acesso por fora do pipeline e precisam ser revisados nas configurações do repositório, em GitHub Apps. |
@@ -118,7 +122,10 @@ O que ainda não segue a tabela acima:
 
 - O ruleset exige pull request e CI verde, mas não aprovação de outra pessoa, porque o repositório tem um mantenedor só (CICD-SEC-1).
 - A exigência de SHA nas actions (`sha_pinning_required`) está desligada, e qualquer action pode rodar. Agora que tudo está fixado por SHA, a exigência pode ser ligada nas configurações do repositório (CICD-SEC-3 e CICD-SEC-8).
-- O `_release.yaml` instala os pacotes npm por versão, sem lockfile, então as dependências transitivas não ficam fixadas. O Node também vem de `lts/*`, sem versão fixa (CICD-SEC-3).
+- O check `Zizmor` roda em todo pull request, mas ainda não é obrigatório no ruleset da `main` (CICD-SEC-1).
+- Releases imutáveis não estão ligados, então uma tag de versão ainda pode ser movida ou apagada (CICD-SEC-9).
+- O semantic-release está fixado na 23.0.0, e o `npm audit` aponta vulnerabilidades em dependências transitivas dessa versão. A atualização chega pelo pull request do Dependabot (CICD-SEC-3).
+- As composite actions não têm teste automatizado. Exercitá-las exige uma conta AWS e uma role OIDC de teste.
 
 ## 2.3. No seu pipeline
 
@@ -205,13 +212,13 @@ jobs:
 
 Tags e branches podem passar a apontar para outro commit, e aí o código que roda no seu pipeline muda junto, com o `GITHUB_TOKEN` do seu repositório. Um SHA completo, de 40 caracteres, sempre aponta para o mesmo commit. É a recomendação do GitHub em [Secure use reference](https://docs.github.com/en/actions/reference/security/secure-use#using-third-party-actions).
 
-Para descobrir o SHA mais recente da `main`:
+Para descobrir o SHA de cada versão publicada, liste as tags `vX.Y.Z`:
 
 ```bash
-git ls-remote https://github.com/lpsm-dev/reusable-workflows refs/heads/main
+git ls-remote --tags https://github.com/lpsm-dev/reusable-workflows 'refs/tags/v*'
 ```
 
-Para atualizar, troque o SHA num commit próprio, de preferência por pull request.
+Fixe o SHA da tag e deixe a versão num comentário, como `@<sha-completo>  # v1.0.0`. Com esse formato, o Dependabot do seu repositório (ecossistema `github-actions`) atualiza o SHA e o comentário juntos. Para atualizar à mão, troque o SHA num commit próprio, de preferência por pull request.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -236,6 +243,8 @@ Gostaria de contribuir? Isso é ótimo! Temos um guia de contribuição para te 
 # 7. Versionamento
 
 As notas de cada versão ficam nos [GitHub Releases](https://github.com/lpsm-dev/reusable-workflows/releases). O [**CHANGELOG.md**](CHANGELOG.md) guarda o histórico até a versão 1.0.0.
+
+As tags seguem o formato `vX.Y.Z`. A primeira versão foi marcada como `1.0.0`, sem prefixo, e a tag `v1.0.0` aponta para o mesmo commit. Não existe tag móvel de major (`v1`): o consumo é pelo SHA, e uma tag móvel não convive com releases imutáveis. A decisão está no [ADR 0005](docs/adrs/0005-adopt-community-practices.md).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

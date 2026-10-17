@@ -4,8 +4,7 @@ name: Manual - Release
 on:
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   release:
@@ -26,17 +25,15 @@ jobs:
     - name: Setup node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
       with:
-        node-version: "lts/*"
-    - name: Copy rules
-      run: |
-        cp .github/config/.releaserc.json .
+        node-version: "24.22.0"
     - name: Install dependencies
-      run: |
-        npm install --location=global semantic-release@23.0.0 \
-          @semantic-release/commit-analyzer@11.1.0 \
-          @semantic-release/release-notes-generator@12.1.0 \
-          conventional-changelog-conventionalcommits@7.0.2
+      # package-lock.json pins the transitive dependencies too (CICD-SEC-3).
+      working-directory: .github/config/release
+      run: npm ci --ignore-scripts
     - name: Release
-      run: npx semantic-release
+      # semantic-release reads .releaserc.json and resolves its plugins from
+      # the working directory, so it runs next to its lockfile.
+      working-directory: .github/config/release
+      run: ./node_modules/.bin/semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

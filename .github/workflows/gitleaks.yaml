@@ -18,8 +18,7 @@ on:
         type: string
         default: ""
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: gitleaks-${{ github.repository }}-${{ github.ref }}
@@ -28,6 +27,8 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-26.04
+    permissions:
+      contents: read
     timeout-minutes: 10
     steps:
     - name: Checkout
