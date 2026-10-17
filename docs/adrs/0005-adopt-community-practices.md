@@ -21,7 +21,7 @@ A pesquisa [Organização de repositórios com pipelines reutilizáveis](../rese
 
 ## Decisão
 
-- **Dependabot.** `.github/dependabot.yml` cobre o ecossistema `github-actions` em `/` e `/actions/*` e o ecossistema `npm` em `.github/config/release`. Roda toda semana, com um pull request agrupado por ecossistema.
+- **Dependabot.** `.github/dependabot.yml` cobre o ecossistema `github-actions` em `/` e `/actions/*` e o ecossistema `npm` em `.github/config/release`. Roda toda semana, com um pull request agrupado por ecossistema e cooldown de 7 dias antes de propor uma versão nova, como pede o zizmor.
 - **Release com lockfile.** O semantic-release e os plugins ficam em `.github/config/release/`, com `package.json`, `package-lock.json` e `.releaserc.json`. O job roda `npm ci` nessa pasta e executa o binário a partir dela, porque o semantic-release resolve os plugins pelo diretório de trabalho. O Node fica fixo na LTS 24.22.0.
 - **Permissões.** Todo workflow declara `permissions: {}` no topo, e cada job declara o que usa.
 - **zizmor.** O job `Zizmor` de `_check-workflows.yaml` audita `.github/workflows/` e `actions/` em modo offline. O binário tem versão e SHA256 fixados, como o actionlint.
