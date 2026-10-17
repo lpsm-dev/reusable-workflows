@@ -56,3 +56,32 @@ jobs:
       run: |
         yamllint --version
         yamllint --strict --format github -c .github/config/.yamllint.yaml .
+  zizmor:
+    name: Zizmor
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      with:
+        persist-credentials: false
+    - name: Install zizmor
+      run: |
+        set -euo pipefail
+        version="1.31.1"
+        archive="zizmor-x86_64-unknown-linux-gnu.tar.gz"
+        url="https://github.com/zizmorcore/zizmor/releases/download/v${version}/${archive}"
+        checksum="d185f726bdaf92df78273217dfdd24ebcd6b0ef48cf3ce776ff5762b6e138c99"
+        work="$(mktemp -d)"
+        curl -fsSL -o "${work}/${archive}" "$url"
+        printf '%s  %s\n' "$checksum" "$archive" | (cd "$work" && sha256sum -c)
+        tar -xzf "${work}/${archive}" -C "$work" zizmor
+        sudo install -m 0755 "${work}/zizmor" /usr/local/bin/zizmor
+        rm -rf "$work"
+        zizmor --version
+    - name: Run zizmor
+      # Audits the workflows and the composite actions under actions/.
+      # --offline keeps the job free of tokens and network calls.
+      run: zizmor --offline --format github .
