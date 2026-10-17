@@ -34,17 +34,17 @@ Esqueleto de cada tipo. Copiar para a pasta do tipo e preencher. Formato em [_te
 
 Decisões. Formato e índice em [adrs/README.md](adrs/README.md).
 
-## 6. rfcs/
+## 6. handbooks/
 
-Propostas antes da decisão. Formato em [rfcs/README.md](rfcs/README.md).
+Explicação de um assunto. Aqui, a página de cada reusable workflow. Índice em [handbooks/README.md](handbooks/README.md).
 
 ## 7. research/
 
 Leitura e fontes. Índice em [research/README.md](research/README.md).
 
-## 8. handbooks/
+## 8. rfcs/
 
-Explicação de um assunto. Aqui, a página de cada reusable workflow. Índice em [handbooks/README.md](handbooks/README.md).
+Propostas antes da decisão. Formato em [rfcs/README.md](rfcs/README.md).
 
 ## 9. runbooks/
 
