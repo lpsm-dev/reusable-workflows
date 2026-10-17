@@ -5,15 +5,33 @@ date: 2026-10-04
 
 # Documentação por componente e templates por ferramenta
 
-Complementa o [001](adr-001-layout.md) sem mudar as três superfícies que existiam na época. Depois, o [004](adr-004-remove-templates.md) removeu `templates/`, deixando só workflows e composite actions, e trocou o caminho `docs/workflows/<nome>.md` por `docs/workflows/<nome>/README.md`.
-
 ## 1. Contexto
 
-O 001 tirou a documentação de `.github/workflows/`, mas não definiu para onde ela vai. O README raiz misturava o detalhe do Gitleaks com a visão geral, e o Taskfile ainda gerava docs em `.github/workflows/docs/`, caminho que o 001 proíbe.
+### 1.1. Situação atual
 
-Em `templates/`, os nomes não diziam o que cada arquivo era. `templates/.gitleaks.toml` tinha o nome da config de verdade, mas era o ruleset opcional do AzSK. `templates/.releaserc.json` publicava no GitLab sem indicar isso no nome. A config de semantic-release para GitHub só existia em `.github/config/`, que é a config interna deste repositório, e a documentação mandava copiar de lá.
+O [adr-001](adr-001-layout.md) tirou a documentação de `.github/workflows/`, mas não definiu para onde ela vai. O README raiz misturava o detalhe do Gitleaks com a visão geral. O Taskfile ainda gerava docs em `.github/workflows/docs/`, caminho que o adr-001 proíbe.
+
+Em `templates/`, os nomes não diziam o que cada arquivo era:
+- `templates/.gitleaks.toml` tinha o nome da config de verdade, mas era o ruleset opcional do AzSK.
+- `templates/.releaserc.json` publicava no GitLab sem indicar isso no nome.
+- A config de semantic-release para GitHub só existia em `.github/config/`, a config interna deste repositório, e a documentação mandava copiar de lá.
+
+### 1.2. Problema
+
+Definir onde fica a documentação de cada workflow e de cada action, e como nomear os templates para que o nome diga o que o arquivo é.
+
+### 1.3. Drivers
+
+- **README legível:** com mais workflows, o README raiz vira o manual de cada um e a visão geral se perde.
+- **Documentação que não mente:** o que importa num workflow (o que ele escaneia, o que fica de fora, as decisões de segurança) precisa ser escrito à mão.
+
+### 1.4. Constraints
+
+- As três superfícies do adr-001 não mudam.
 
 ## 2. Decisão
+
+Decidimos documentar cada componente na própria página e nomear os templates por ferramenta e variante, aceitando manter uma página escrita à mão por workflow.
 
 - Cada reusable workflow público tem uma página escrita à mão em `docs/workflows/<nome>.md`. O README raiz só lista o workflow e aponta para essa página.
 - Cada composite action tem um `actions/<nome>/README.md` gerado pelo action-docs (`task github:action:docs`), entre marcadores `action-docs-all`, com o caminho real da action no exemplo de uso.
@@ -23,14 +41,62 @@ Em `templates/`, os nomes não diziam o que cada arquivo era. `templates/.gitlea
 
 ## 3. Opções consideradas
 
-- **A (escolhida): docs em `docs/workflows/` e templates por ferramenta.** Uma página por workflow, e o nome de cada template diz a ferramenta e a variante.
-- **B (rejeitada): manter tudo no README raiz.** Com mais workflows, o README vira o manual de cada um e a visão geral se perde.
-- **C (rejeitada): gerar a página dos workflows inteira com action-docs.** O action-docs gera entradas e exemplo de uso. O que importa num workflow como o do Gitleaks (o que ele escaneia, o que fica de fora, as decisões de segurança) precisa ser escrito à mão.
-- **D (rejeitada): renomear `templates/`.** O nome foi decidido no 001 e não era o problema. O que confundia eram os nomes dos arquivos dentro da pasta.
+### 3.1. Opção A: docs em `docs/workflows/` e templates por ferramenta
 
-## 4. Consequências
+Uma página por workflow, e o nome de cada template diz a ferramenta e a variante.
+
+| Prós | Contras |
+|---|---|
+| README raiz curto | Uma página a mais para manter por workflow |
+| Nome do template diz o que ele é | |
+
+**Adotada**, porque separa visão geral de detalhe.
+
+### 3.2. Opção B: manter tudo no README raiz
+
+| Prós | Contras |
+|---|---|
+| Um arquivo só | A visão geral se perde com mais workflows |
+
+**Rejeitada**, porque não escala.
+
+### 3.3. Opção C: gerar a página dos workflows inteira com action-docs
+
+| Prós | Contras |
+|---|---|
+| Página sempre igual ao YAML | Gera só entradas e exemplo; o que importa precisa ser escrito à mão |
+
+**Rejeitada**, porque a parte que importa não vem do YAML.
+
+### 3.4. Opção D: renomear `templates/`
+
+| Prós | Contras |
+|---|---|
+| Nome novo para a pasta | O nome da pasta não era o problema |
+
+**Rejeitada**, porque o que confundia eram os nomes dos arquivos dentro da pasta.
+
+## 4. Trade-offs aceitos
+
+| Trade-off | Impacto | Mitigação |
+|---|---|---|
+| Página escrita à mão | Pode divergir do YAML | Checklist no CONTRIBUTING para todo workflow novo |
+| Template copiado da config interna | As duas podem divergir | Uma é ponto de partida para outros projetos; a outra é a config deste repositório |
+
+## 5. Consequências
+
+### 5.1. Positivas
 
 - O README raiz vira a porta de entrada: estrutura, catálogo e exemplos curtos.
-- Um workflow novo exige uma página em `docs/workflows/`, e uma action nova exige rodar `task github:action:docs`. O checklist está no CONTRIBUTING.
-- `templates/semantic-release/github.json` nasce como cópia de `.github/config/.releaserc.json`. As duas podem divergir, porque uma é ponto de partida para outros projetos e a outra é a config deste repositório.
 - O `gitleaks/azsk.toml` passou a usar `regexes` nas allowlists, que é a chave do Gitleaks 8, e ganhou o `id` que faltava na regra `CSCAN0240-2`. Antes disso, a config não carregava na versão 8.23.3 que o workflow instala.
+
+### 5.2. Negativas
+
+- Um workflow novo exige uma página, e uma action nova exige rodar `task github:action:docs`.
+- `templates/semantic-release/github.json` nasce como cópia de `.github/config/.releaserc.json`.
+
+## 6. Referências
+
+- [adr-001-layout.md](adr-001-layout.md): as três superfícies.
+- [adr-004-remove-templates.md](adr-004-remove-templates.md): remove `templates/` e muda a página para `docs/workflows/<nome>/README.md`.
+- [adr-006-docs-taxonomy.md](adr-006-docs-taxonomy.md): move a página do workflow para `docs/handbooks/<nome>/`.
