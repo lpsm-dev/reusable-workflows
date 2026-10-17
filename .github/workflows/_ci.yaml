@@ -15,9 +15,9 @@ jobs:
   scan:
     permissions:
       contents: read
-    # ADR 0005 keeps the relative path instead of the $/ syntax.
+    # ADR 005 keeps the relative path instead of the $/ syntax.
     uses: ./.github/workflows/gitleaks.yaml  # zizmor: ignore[self-repository]
     with:
       # The AzSK example doubles as this repository's ruleset, so CI fails if
       # a Gitleaks upgrade stops it from loading.
-      config: docs/workflows/gitleaks/azsk.toml
+      config: docs/handbooks/gitleaks/azsk.toml

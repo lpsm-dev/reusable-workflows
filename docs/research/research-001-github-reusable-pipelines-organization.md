@@ -292,7 +292,7 @@ Leitura (Inferência): os repositórios com mais disciplina de supply chain (gra
 
 ## 6. Comparação com este repositório
 
-Esta seção compara. Ela não propõe mudanças de código. O repositório é `lpsm-dev/reusable-workflows`, no commit `4c3000c33970d51eba3d8493aa9e32e32e8b0dee`. Fatos sobre ele vêm de `README.md`, dos ADRs 0001 a 0004 em `docs/adrs/` e dos workflows em `.github/workflows/`.
+Esta seção compara. Ela não propõe mudanças de código. O repositório é `lpsm-dev/reusable-workflows`, no commit `4c3000c33970d51eba3d8493aa9e32e32e8b0dee`. Fatos sobre ele vêm de `README.md`, dos ADRs 001 a 004 em `docs/adrs/` e dos workflows em `.github/workflows/`.
 
 ### 6.1 Onde já segue o recomendado
 
@@ -301,17 +301,17 @@ Esta seção compara. Ela não propõe mudanças de código. O repositório é `
 | Reusable workflow chamável plano em `.github/workflows/` | `.github/workflows/gitleaks.yaml` com `on: workflow_call` | [Reuse workflows](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows) |
 | Consumidores fixam SHA completo | README, seção de uso | [Reuse workflows](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows) |
 | Actions de terceiros por SHA com comentário de versão | `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1` e `persist-credentials: false` | [Secure use](https://docs.github.com/en/actions/reference/security/secure-use) |
-| `GITHUB_TOKEN` somente leitura por padrão e escrita só no job de release | `permissions: contents: read` e ADR 0004 | [Secure use](https://docs.github.com/en/actions/reference/security/secure-use) |
+| `GITHUB_TOKEN` somente leitura por padrão e escrita só no job de release | `permissions: contents: read` e ADR 003 | [Secure use](https://docs.github.com/en/actions/reference/security/secure-use) |
 | Binário baixado com verificação de SHA256 | `gitleaks.yaml` | [Secure use](https://docs.github.com/en/actions/reference/security/secure-use) |
-| README por componente com entradas, saídas e exemplo, gerado por action-docs | ADR 0002, tarefa `action:docs` | [Manage custom actions](https://docs.github.com/en/actions/how-tos/create-and-publish-actions/manage-custom-actions) |
-| Ruleset na branch principal e release sem commit na `main` | ADR 0004 | [About rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets) |
+| README por componente com entradas, saídas e exemplo, gerado por action-docs | ADR 002, tarefa `action:docs` | [Manage custom actions](https://docs.github.com/en/actions/how-tos/create-and-publish-actions/manage-custom-actions) |
+| Ruleset na branch principal e release sem commit na `main` | ADR 003 | [About rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets) |
 | Lint dos workflows (actionlint e yamllint) | `_check-workflows.yaml` | [Secure use](https://docs.github.com/en/actions/reference/security/secure-use) |
 
 ### 6.2 Onde diverge ou não há evidência
 
 | Tema | Este repositório | Referência oficial | Comunidade (de 20) |
 |---|---|---|---|
-| Repositório por action | Um repositório com três superfícies (ADR 0001 rejeitou um repositório por action para ter um SHA único como controle do CICD-SEC-3) | Action pública em repositório próprio; Marketplace exige um metadado de action na raiz e o repositório só com a action | 10 têm actions fora de `.github/`, quase todos em monorepo |
+| Repositório por action | Um repositório com três superfícies (ADR 001 rejeitou um repositório por action para ter um SHA único como controle do CICD-SEC-3) | Action pública em repositório próprio; Marketplace exige um metadado de action na raiz e o repositório só com a action | 10 têm actions fora de `.github/`, quase todos em monorepo |
 | Formato da tag | Tag sem `v` (`tagFormat: ${version}`), única tag `1.0.0`, sem major móvel | Tag semver mais `v1` móvel | 12 de 16 usam `v` como padrão; 2 usam tag sem `v`; 6 mantêm major móvel |
 | `permissions` | `contents: read` no nível do workflow | Well-Architected: `permissions: {}` no workflow e permissões por job | grafana, chainguard e equinor usam `{}` no topo |
 | Política `sha_pinning_required` | Desligada, registrada no README como lacuna conhecida | Política existe; reusable workflows ainda podem ser referenciados por tag | Não observável por git |
@@ -329,7 +329,7 @@ Esta seção compara. Ela não propõe mudanças de código. O repositório é `
 - Inferência: sem Dependabot ou Renovate, os pins por SHA do repositório dependem de atualização manual. Nenhum arquivo de configuração foi encontrado na árvore.
 - Inferência: a política `sha_pinning_required` não cobriria a referência por tag a reusable workflows, então ligar a política não substitui a orientação de SHA que o README dá aos consumidores. O lockfile (public preview desde 2026-10-14) é descrito pela documentação como melhor medida para quem consome, e o texto do README sobre SHA continua válido para quem não o adota.
 - Inferência: a referência `$/` poderia substituir `./.github/workflows/gitleaks.yaml` em `_ci.yaml`. OpenAstronomy e entur chamam o workflow local nos próprios testes, o mesmo padrão. A referência `$/` não existe no GHES.
-- Inferência: a abordagem de smartcontractkit (fonte por componente mais cópia gerada) mostra uma forma de versionar cada workflow à parte apesar da pasta plana, mas só vale a pena se a versão por workflow for necessária. O ADR 0001 escolheu uma versão única.
+- Inferência: a abordagem de smartcontractkit (fonte por componente mais cópia gerada) mostra uma forma de versionar cada workflow à parte apesar da pasta plana, mas só vale a pena se a versão por workflow for necessária. O ADR 001 escolheu uma versão única.
 - Inferência: kubewarden documenta que actions chamadas pelos próprios workflows devem ser atualizadas por SHA antes da tag. O mesmo risco circular existe aqui, onde os workflows internos chamam as composite actions por caminho local.
 - Inferência: `lpsm-dev/.github` não foi encontrado de forma anônima. Pode ser privado ou inexistente, então herança de community health não foi verificada.
 
@@ -394,4 +394,4 @@ Os 20 repositórios da seção 4, nos SHAs listados na tabela 4.1. Também foram
 
 ### 8.4 Repositório avaliado
 
-`lpsm-dev/reusable-workflows` no commit `4c3000c33970d51eba3d8493aa9e32e32e8b0dee`: `README.md`, `CONTRIBUTING.md`, `docs/adrs/0001` a `0004`, `.github/workflows/` e `.github/config/.releaserc.json`.
+`lpsm-dev/reusable-workflows` no commit `4c3000c33970d51eba3d8493aa9e32e32e8b0dee`: `README.md`, `CONTRIBUTING.md`, `docs/adrs/adr-001` a `adr-004`, `.github/workflows/` e `.github/config/.releaserc.json`.

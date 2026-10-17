@@ -1,3 +1,7 @@
+---
+date: 2026-10-05
+---
+
 <!-- BEGIN_DOCS -->
 
 [◀ Voltar](../../../README.md)
@@ -102,7 +106,7 @@ O [`azsk.toml`](azsk.toml) traz as regras padrão mais 39 regras de credenciais 
 SHA="$(git ls-remote https://github.com/lpsm-dev/reusable-workflows refs/heads/main | cut -f1)"
 mkdir -p .github/config
 curl -fsSL -o .github/config/.gitleaks.toml \
-  "https://raw.githubusercontent.com/lpsm-dev/reusable-workflows/${SHA}/docs/workflows/gitleaks/azsk.toml"
+  "https://raw.githubusercontent.com/lpsm-dev/reusable-workflows/${SHA}/docs/handbooks/gitleaks/azsk.toml"
 ```
 
 O primeiro comando pega o SHA atual da `main`. Para usar outro commit, atribua o SHA completo dele a `SHA`.
