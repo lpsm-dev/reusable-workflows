@@ -35,3 +35,11 @@ tasks:
       msg: actionlint {{ .PATH_ERROR }}
     cmds:
     - actionlint
+
+  action:audit:
+    desc: Auditing workflows and composite actions with zizmor
+    preconditions:
+    - sh: which zizmor
+      msg: zizmor {{ .PATH_ERROR }}
+    cmds:
+    - zizmor --offline {{ .ROOT_DIR }}

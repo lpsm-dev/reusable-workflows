@@ -59,7 +59,7 @@ Seja bem-vindo e obrigado por considerar contribuir com este projeto! Ler e segu
 
 # 2. Setup
 
-As ferramentas de linha de comando deste repositório (`actionlint`, `yamllint`, `gitleaks`, `task`, `pre-commit` e `act`) estão declaradas no [devbox.json](devbox.json). As etapas abaixo deixam tudo pronto em poucos comandos.
+As ferramentas de linha de comando deste repositório (`actionlint`, `yamllint`, `zizmor`, `gitleaks`, `task`, `pre-commit` e `act`) estão declaradas no [devbox.json](devbox.json). As etapas abaixo deixam tudo pronto em poucos comandos.
 
 ## 2.1. Devbox
 
@@ -104,6 +104,7 @@ Execute `task` na raiz do repositório para listar os comandos. Os mais usados:
 | `task precommit:init` | Instala os hooks do pre-commit, incluindo a validação da mensagem de commit |
 | `task yamllint` | Valida os arquivos YAML com a config de `.github/config/.yamllint.yaml` |
 | `task github:action:lint` | Roda o `actionlint` nos workflows |
+| `task github:action:audit` | Roda o `zizmor` nos workflows e nas composite actions |
 | `task github:action:docs` | Gera o `README.md` de cada composite action a partir do `action.yaml` |
 | `task gitleaks` | Procura segredos no histórico do repositório com as regras padrão do Gitleaks |
 
@@ -129,13 +130,13 @@ Antes de criar algo, veja em [Estrutura do repositório](README.md#12-estrutura-
 ## 3.2. Composite action
 
 1. Crie `actions/<nome>/action.yaml` com `runs.using: composite`. Use kebab-case e comece o nome pelo provedor ou pela ferramenta, como em `aws-ecr-create`.
-2. Passe pelo [checklist de segurança](#4-segurança), baseado no OWASP Top 10 CI/CD.
+2. Passe pelo [checklist de segurança](#4-segurança), baseado no OWASP Top 10 CI/CD, e rode `task github:action:audit`.
 3. Rode `task github:action:docs`. A task cria o `actions/<nome>/README.md` com os marcadores do action-docs e gera descrição, entradas e exemplo de uso a partir do `action.yaml`.
 4. Adicione uma linha no [catálogo de actions](actions/README.md#2-catálogo) e na tabela de [composite actions](README.md#32-composite-actions) do README.
 
 ## 3.3. Workflow interno
 
-Automação que serve só a este repositório, como CI e release, fica em `.github/workflows/` com `_` no início do nome: `_ci.yaml` (Gitleaks), `_check-workflows.yaml` (actionlint e yamllint) e `_release.yaml` (semantic-release). A configuração das ferramentas desses workflows fica em `.github/config/` e serve só a este repositório: não é modelo para outros projetos copiarem. Nada de fora deve chamar esses arquivos. Workflows internos seguem o mesmo [checklist de segurança](#4-segurança).
+Automação que serve só a este repositório, como CI e release, fica em `.github/workflows/` com `_` no início do nome: `_ci.yaml` (Gitleaks), `_check-workflows.yaml` (actionlint, yamllint e zizmor) e `_release.yaml` (semantic-release). A configuração das ferramentas desses workflows fica em `.github/config/`, e a do semantic-release, com o lockfile, em `.github/config/release/` e serve só a este repositório: não é modelo para outros projetos copiarem. Nada de fora deve chamar esses arquivos. Workflows internos seguem o mesmo [checklist de segurança](#4-segurança).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -143,9 +144,9 @@ Automação que serve só a este repositório, como CI e release, fica em `.gith
 
 Todo workflow e toda action, novos ou alterados, seguem o [OWASP Top 10 CI/CD Security Risks](https://owasp.org/projects/top-10-cicd-security-risks). Uma peça compartilhada roda no pipeline de vários repositórios, então uma falha aqui se espalha para todos eles. Revise cada item antes de abrir o pull request:
 
-- **Dependências (CICD-SEC-3 e CICD-SEC-9):** fixe toda action de terceiros pelo SHA completo, com a versão num comentário (`# v7.0.1`). Binário baixado durante o job só roda depois de conferido por SHA256.
+- **Dependências (CICD-SEC-3 e CICD-SEC-9):** fixe toda action de terceiros pelo SHA completo, com a versão num comentário (`# v7.0.1`). Binário baixado durante o job só roda depois de conferido por SHA256. O Dependabot atualiza os SHAs e lê a versão do comentário, então mantenha o comentário na mesma linha.
 - **Gatilhos e injeção (CICD-SEC-4):** não use `pull_request_target`, e reusable workflow só responde a `workflow_call`. Inputs, nomes de branch e títulos de PR entram nos scripts por `env:`, nunca por `${{ }}` dentro do `run:`, como recomenda o [guia de injeção de script do GitHub](https://docs.github.com/en/actions/reference/security/secure-use#good-practices-for-mitigating-script-injection-attacks).
-- **Permissões (CICD-SEC-5):** declare `permissions` no workflow, com o mínimo necessário. Escrita só no job que precisa dela.
+- **Permissões (CICD-SEC-5):** declare `permissions: {}` no topo do workflow e dê a cada job só o que ele usa. Escrita só no job que precisa dela.
 - **Credenciais (CICD-SEC-2 e CICD-SEC-6):** prefira OIDC a segredos de longa duração. Use `persist-credentials: false` no checkout quando o job não fizer push, e nunca imprima segredo no log.
 - **Runner (CICD-SEC-7):** use runners hospedados pelo GitHub e defina `timeout-minutes` em todo job.
 - **Serviços externos (CICD-SEC-8):** não mande código, token ou relatório para serviço de fora sem uma decisão registrada em ADR.
