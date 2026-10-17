@@ -119,8 +119,8 @@ Antes de criar algo, veja em [Estrutura do repositório](README.md#12-estrutura-
 1. Crie o arquivo direto em `.github/workflows/`, sem subpasta e sem `_` no início do nome, por exemplo `.github/workflows/terraform-plan.yaml`. O GitHub não encontra reusable workflows em subpastas.
 2. Use `on: workflow_call` como único gatilho.
 3. Passe pelo [checklist de segurança](#4-segurança), baseado no OWASP Top 10 CI/CD.
-4. Se a ferramenta usa um arquivo de config, faça o workflow funcionar sem ele, com o padrão da ferramenta, e aceite o caminho num input opcional. Não crie arquivo para o projeto copiar: exemplos opcionais ficam na pasta do workflow, como o [`azsk.toml`](docs/workflows/gitleaks/azsk.toml) do Gitleaks.
-5. Escreva a página do workflow em `docs/workflows/<nome>/README.md`, seguindo o modelo de [`docs/workflows/gitleaks/README.md`](docs/workflows/gitleaks/README.md).
+4. Se a ferramenta usa um arquivo de config, faça o workflow funcionar sem ele, com o padrão da ferramenta, e aceite o caminho num input opcional. Não crie arquivo para o projeto copiar: exemplos opcionais ficam na pasta do workflow, como o [`azsk.toml`](docs/handbooks/gitleaks/azsk.toml) do Gitleaks.
+5. Escreva a página do workflow como handbook, em `docs/handbooks/<nome>/handbook-nnn-<nome>-workflow.md`, seguindo o modelo de [`handbook-001-gitleaks-workflow.md`](docs/handbooks/gitleaks/handbook-001-gitleaks-workflow.md). As regras de nome e numeração estão em [`docs/README.md`](docs/README.md).
 6. Adicione uma linha na tabela de [reusable workflows](README.md#31-reusable-workflows) do README.
 7. Teste antes do merge. Se o workflow fizer sentido para este repositório, chame-o no [`_ci.yaml`](.github/workflows/_ci.yaml) pelo caminho relativo (`uses: ./.github/workflows/<nome>.yaml`), que roda a versão do próprio branch. Se não fizer, chame-o de um repositório de teste apontando para o SHA do seu branch.
 
@@ -160,11 +160,11 @@ O README lista as [pendências conhecidas](README.md#22-pendências-conhecidas) 
 # 5. Padrão de documentação
 
 - A documentação é escrita em português. Código, nomes de inputs e descrições dentro do `action.yaml` ficam em inglês.
-- Os documentos escritos à mão (READMEs, este guia e as páginas em `docs/workflows/<nome>/README.md`) seguem o esqueleto abaixo: marcadores `BEGIN_DOCS` e `END_DOCS`, âncora `readme-top`, link "◀ Voltar" para a página de cima (menos no README raiz), seções numeradas (`# 1. Visão Geral`, `## 1.1. Objetivo`) e o link "back to top" no fim de cada seção `#`.
+- Os documentos escritos à mão (READMEs, este guia e os handbooks dos workflows em `docs/handbooks/<nome>/`) seguem o esqueleto abaixo: marcadores `BEGIN_DOCS` e `END_DOCS`, âncora `readme-top`, link "◀ Voltar" para a página de cima (menos no README raiz), seções numeradas (`# 1. Visão Geral`, `## 1.1. Objetivo`) e o link "back to top" no fim de cada seção `#`.
 - O sumário fica entre os marcadores `START_TABLE_OF_CONTENTS` e `END_TABLE_OF_CONTENTS`. Quem gera o sumário e a numeração das seções é o [gtoc](https://github.com/lpsm-dev/gtoc): escreva os títulos sem número e rode `gtoc generate --number-headings <arquivo>.md`. Links para seções usam a âncora numerada, como `#12-estrutura-do-repositório`.
 - Não escreva os comentários HTML desses marcadores em código inline no meio do texto. O gtoc trata a linha como sumário e deixa de numerar todas as seções seguintes. Dentro de bloco de código, como no esqueleto, não há problema.
 - Os `README.md` das composite actions são gerados pelo `task github:action:docs`. Não edite o trecho entre os marcadores `action-docs-all` à mão.
-- ADRs ficam em `docs/adrs/NNNN-<titulo>.md`, com front matter (`status` e `date`) e as seções Contexto, Decisão, Opções consideradas e Consequências.
+- Os documentos de `docs/` seguem as regras de [`docs/README.md`](docs/README.md): uma pasta por tipo, nome `tipo-nnn-titulo.md` e o esqueleto de cada tipo em [`docs/_templates/`](docs/_templates/README.md).
 
 Esqueleto de uma página nova:
 
