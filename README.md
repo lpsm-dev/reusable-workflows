@@ -67,9 +67,9 @@ Toda peça daqui segue o [OWASP Top 10 CI/CD Security Risks](https://owasp.org/p
 │       └── _*.yaml          # CI e release deste repositório
 ├── actions/
 │   └── <nome>/              # composite action: action.yaml + README.md
-└── docs/
-    ├── workflows/<nome>/    # página de cada reusable workflow e exemplos de config
-    ├── adrs/                # decisões de arquitetura
+└── docs/                    # índice e regras em docs/README.md
+    ├── adrs/                # decisões
+    ├── handbooks/<nome>/    # página de cada reusable workflow e exemplos de config
     └── research/            # pesquisas que embasam as decisões
 ```
 
@@ -79,12 +79,12 @@ Toda peça daqui segue o [OWASP Top 10 CI/CD Security Risks](https://owasp.org/p
 | `.github/workflows/_*.yaml` | CI e release deste repositório | Só este repositório | Eventos como `push`, `pull_request` e disparo manual |
 | `actions/<nome>/` | Composite actions: sequências de steps | Outros repositórios | `jobs.<id>.steps[*].uses` |
 | `.github/config/` | Configuração das ferramentas usadas aqui: yamllint e, em `release/`, o semantic-release com lockfile | Só este repositório | Lida pelos workflows internos e pelo Taskfile |
-| `docs/` | Página de cada reusable workflow, exemplos de config e ADRs | Pessoas | Leitura |
+| `docs/` | Uma pasta por tipo de documento: ADRs, pesquisas, handbooks (a página de cada reusable workflow) e, quando houver, RFCs e runbooks | Pessoas | Leitura, a partir de [`docs/README.md`](docs/README.md) |
 
 Duas regras do GitHub explicam esse desenho:
 
 - O GitHub só encontra um reusable workflow se o arquivo estiver direto em `.github/workflows/`. Subpastas não são suportadas. Por isso os workflows públicos e os internos dividem a mesma pasta, e o prefixo `_` marca os internos.
-- Composite actions podem ficar em qualquer pasta. Aqui elas ficam em `actions/`, uma pasta por action, com o `README.md` ao lado do `action.yaml`. Como `.github/workflows/` não aceita subpastas, a documentação de cada workflow fica em `docs/workflows/<nome>/`.
+- Composite actions podem ficar em qualquer pasta. Aqui elas ficam em `actions/`, uma pasta por action, com o `README.md` ao lado do `action.yaml`. Como `.github/workflows/` não aceita subpastas, a documentação de cada workflow fica no handbook dele, em `docs/handbooks/<nome>/`.
 
 As decisões completas estão nos ADRs, em [`docs/adrs/`](docs/adrs/).
 
@@ -93,7 +93,7 @@ As decisões completas estão nos ADRs, em [`docs/adrs/`](docs/adrs/).
 - **Reusable workflow**: reaproveita um ou mais jobs inteiros. Roda em runner próprio e é chamado no lugar de um job. Exemplo: o scan de segredos com Gitleaks.
 - **Composite action**: reaproveita uma sequência de steps dentro de um job que já existe. Roda no runner e no workspace do job que a chama. Exemplo: publicar arquivos no S3 e invalidar o cache do CloudFront.
 
-E os arquivos de configuração? Cada projeto mantém os seus, como o `.github/config/.gitleaks.toml`. Os workflows daqui funcionam sem config quando a ferramenta tem um padrão razoável, então o projeto só commita um arquivo quando quer personalizar. Exemplos opcionais ficam na pasta de cada workflow, em `docs/workflows/<nome>/`.
+E os arquivos de configuração? Cada projeto mantém os seus, como o `.github/config/.gitleaks.toml`. Os workflows daqui funcionam sem config quando a ferramenta tem um padrão razoável, então o projeto só commita um arquivo quando quer personalizar. Exemplos opcionais ficam na pasta do handbook de cada workflow, em `docs/handbooks/<nome>/`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -145,7 +145,7 @@ Os mesmos princípios valem para o repositório que chama:
 
 | Workflow | O que faz | Documentação |
 | --- | --- | --- |
-| [`gitleaks.yaml`](.github/workflows/gitleaks.yaml) | Procura segredos versionados com o Gitleaks. A config é opcional: sem ela, usa as regras padrão | [README](docs/workflows/gitleaks/README.md) |
+| [`gitleaks.yaml`](.github/workflows/gitleaks.yaml) | Procura segredos versionados com o Gitleaks. A config é opcional: sem ela, usa as regras padrão | [README](docs/handbooks/gitleaks/handbook-001-gitleaks-workflow.md) |
 
 ## 3.2. Composite actions
 
@@ -185,7 +185,7 @@ jobs:
     uses: lpsm-dev/reusable-workflows/.github/workflows/gitleaks.yaml@<sha-completo>
 ```
 
-Para usar uma config própria, passe `with: config: <caminho>`. A ordem de busca está na [página do workflow](docs/workflows/gitleaks/README.md#23-qual-config-é-usada).
+Para usar uma config própria, passe `with: config: <caminho>`. A ordem de busca está na [página do workflow](docs/handbooks/gitleaks/handbook-001-gitleaks-workflow.md#23-qual-config-é-usada).
 
 ## 4.3. Usando uma composite action
 
@@ -244,7 +244,7 @@ Gostaria de contribuir? Isso é ótimo! Temos um guia de contribuição para te 
 
 As notas de cada versão ficam nos [GitHub Releases](https://github.com/lpsm-dev/reusable-workflows/releases). O [**CHANGELOG.md**](CHANGELOG.md) guarda o histórico até a versão 1.0.0.
 
-As tags seguem o formato `vX.Y.Z`. A primeira versão foi marcada como `1.0.0`, sem prefixo, e a tag `v1.0.0` aponta para o mesmo commit. Não existe tag móvel de major (`v1`): o consumo é pelo SHA, e uma tag móvel não convive com releases imutáveis. A decisão está no [ADR 0005](docs/adrs/0005-adopt-community-practices.md).
+As tags seguem o formato `vX.Y.Z`. A primeira versão foi marcada como `1.0.0`, sem prefixo, e a tag `v1.0.0` aponta para o mesmo commit. Não existe tag móvel de major (`v1`): o consumo é pelo SHA, e uma tag móvel não convive com releases imutáveis. A decisão está no [ADR 005](docs/adrs/adr-005-adopt-community-practices.md).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

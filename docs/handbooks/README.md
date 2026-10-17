@@ -1,0 +1,15 @@
+# handbooks
+
+O handbook explica um assunto: o que é, como as peças se relacionam, e para onde seguir.
+
+O handbook é o arquivo `handbook-nnn-titulo.md`. A pasta do assunto guarda o resto, como exemplos de config. `nnn` tem três dígitos e começa em `001`. A ordem é a `date`, crescente. No mesmo dia, o título. Entrar, sair ou mudar a data recalcula a sequência desde `001` e atualiza os links.
+
+Frontmatter na primeira linha: só `date` (`YYYY-MM-DD`). Sem `type`, `status`, `id`, `version`, `tags`, `related_docs` ou `review_date`.
+
+Cada reusable workflow público tem um handbook, na pasta com o nome do workflow.
+
+## 1. Neste repo
+
+| Assunto | Handbook | Resto da pasta |
+|---|---|---|
+| `gitleaks` | [handbook-001-gitleaks-workflow.md](gitleaks/handbook-001-gitleaks-workflow.md) | [azsk.toml](gitleaks/azsk.toml): exemplo opcional de config, usado também pelo CI deste repo |
