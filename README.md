@@ -121,7 +121,7 @@ Um workflow compartilhado roda no pipeline de todo repositório que o chama, com
 O que ainda não segue a tabela acima:
 
 - O ruleset exige pull request e CI verde, mas não aprovação de outra pessoa, porque o repositório tem um mantenedor só (CICD-SEC-1).
-- A exigência de SHA nas actions (`sha_pinning_required`) está desligada, e qualquer action pode rodar. Agora que tudo está fixado por SHA, a exigência pode ser ligada nas configurações do repositório (CICD-SEC-3 e CICD-SEC-8).
+- O repositório exige SHA completo em toda action (`sha_pinning_required`), mas a lista de actions permitidas continua aberta (`allowed_actions: all`): qualquer action fixada por SHA pode rodar (CICD-SEC-8).
 - O check `Zizmor` roda em todo pull request, mas ainda não é obrigatório no ruleset da `main` (CICD-SEC-1).
 - O semantic-release está fixado na 23.0.0, e o `npm audit` aponta vulnerabilidades em dependências transitivas dessa versão. A atualização chega pelo pull request do Dependabot (CICD-SEC-3).
 - As composite actions não têm teste automatizado. Exercitá-las exige uma conta AWS e uma role OIDC de teste.
