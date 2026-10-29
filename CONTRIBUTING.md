@@ -127,6 +127,8 @@ Antes de criar algo, veja em [Estrutura do repositório](README.md#12-estrutura-
 > [!WARNING]
 > Dentro de um reusable workflow, o contexto `github` é o do repositório que chama. Um `uses: ./actions/<nome>` procura a action no workspace, que tem o código de quem chama, e não o deste repositório. Para usar uma composite action daqui, referencie `lpsm-dev/reusable-workflows/actions/<nome>@<sha-completo>`.
 
+Publique a action antes de atualizar o workflow que a chama. Fixe no workflow o SHA do merge que publicou a action, teste esse workflow em um repositório consumidor e atualize o SHA quando a action mudar. O `actionlint` atual ainda rejeita a referência `$/` que o GitHub oferece para actions do mesmo repositório; a decisão está no [adr-007](docs/adrs/adr-007-tool-actions-and-workflow-wrappers.md).
+
 ## 3.2. Composite action
 
 1. Crie `actions/<nome>/action.yaml` com `runs.using: composite`. Use kebab-case e comece o nome pelo provedor ou pela ferramenta, como em `aws-ecr-create`.

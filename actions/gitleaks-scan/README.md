@@ -37,7 +37,7 @@ This action is a `composite` action.
 
 ## 1. Exemplo de job
 
-Troque `<sha-completo>` pelo SHA de 40 caracteres de uma versão publicada deste repositório.
+O exemplo fixa o SHA completo de uma versão publicada deste repositório.
 
 ```yaml
 name: Secret scan
@@ -58,7 +58,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       with:
         persist-credentials: false
-    - uses: lpsm-dev/reusable-workflows/actions/gitleaks-scan@<sha-completo>
+    - uses: lpsm-dev/reusable-workflows/actions/gitleaks-scan@448df7be7d80aafadc6e0db77bc577c031cd0bca
 ```
 
 ## 2. Configuração e resultado

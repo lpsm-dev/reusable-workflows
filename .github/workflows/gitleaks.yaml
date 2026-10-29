@@ -1,8 +1,6 @@
 ---
-# OWASP CI/CD Top 10: workflow_call only, read-only token
-# (persist-credentials: false), pinned checksum, no pull_request_target,
-# contents: read, --redact, timeout, official release only, no artifact upload,
-# failure is the log.
+# OWASP CI/CD Top 10: workflow_call only, read-only token,
+# pinned action and checksum, --redact, timeout, no artifact upload.
 name: Gitleaks
 
 on:
@@ -36,36 +34,7 @@ jobs:
       with:
         persist-credentials: false
         fetch-depth: 0
-    - name: Install Gitleaks
-      run: |
-        set -euo pipefail
-        version="8.23.3"
-        archive="gitleaks_${version}_linux_x64.tar.gz"
-        url="https://github.com/gitleaks/gitleaks/releases/download/v${version}/${archive}"
-        checksum="73a35edc2285afd689e712b8e0ebad3f2eaf94b0d67cd6e1f0ec693ac751bb4a"
-        work="$(mktemp -d)"
-        curl -fsSL -o "${work}/${archive}" "$url"
-        printf '%s  %s\n' "$checksum" "$archive" | (cd "$work" && sha256sum -c)
-        tar -xzf "${work}/${archive}" -C "$work" gitleaks
-        sudo install -m 0755 "${work}/gitleaks" /usr/local/bin/gitleaks
-        rm -rf "$work"
-        gitleaks version
     - name: Scan
-      env:
-        CONFIG: ${{ inputs.config }}
-      run: |
-        set -euo pipefail
-        root="$(mktemp -d)"
-        trap 'rm -rf "$root"' EXIT
-        git archive --format=tar HEAD | tar -x -C "$root"
-        if [ -z "$CONFIG" ] && [ -f "${GITHUB_WORKSPACE}/.github/config/.gitleaks.toml" ]; then
-          CONFIG=.github/config/.gitleaks.toml
-        fi
-        args=(detect --no-git --source "$root" --redact --no-banner)
-        if [ -n "$CONFIG" ]; then
-          echo "Using Gitleaks config: $CONFIG"
-          args+=(--config "${GITHUB_WORKSPACE}/${CONFIG}")
-        else
-          echo "No Gitleaks config found, using the default lookup"
-        fi
-        gitleaks "${args[@]}"
+      uses: lpsm-dev/reusable-workflows/actions/gitleaks-scan@448df7be7d80aafadc6e0db77bc577c031cd0bca
+      with:
+        config: ${{ inputs.config }}
