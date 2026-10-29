@@ -13,3 +13,4 @@ Cada reusable workflow público tem um handbook, na pasta com o nome do workflow
 | Assunto | Handbook | Resto da pasta |
 |---|---|---|
 | `gitleaks` | [handbook-001-gitleaks-workflow.md](gitleaks/handbook-001-gitleaks-workflow.md) | Nada. A config do AzSK fica em `.github/config/.gitleaks.toml` |
+| `semantic-release` | [handbook-002-semantic-release-workflow.md](semantic-release/handbook-002-semantic-release-workflow.md) | A configuração e o lockfile ficam no repositório que chama |
