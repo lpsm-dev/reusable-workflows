@@ -1,0 +1,24 @@
+---
+name: Actionlint check
+description: Validate GitHub Actions workflows with pinned actionlint and ShellCheck
+
+runs:
+  using: composite
+  steps:
+  - name: Install actionlint
+    shell: bash
+    run: |
+      bash "$GITHUB_ACTION_PATH/../_lib/install-verified.sh" \
+        "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz" \
+        "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8" \
+        tar.gz actionlint "$RUNNER_TEMP/actionlint"
+  - name: Install ShellCheck
+    shell: bash
+    run: |
+      bash "$GITHUB_ACTION_PATH/../_lib/install-verified.sh" \
+        "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.gz" \
+        "b7af85e41cc99489dcc21d66c6d5f3685138f06d34651e6d34b42ec6d54fe6f6" \
+        tar.gz shellcheck-v0.11.0/shellcheck "$RUNNER_TEMP/shellcheck"
+  - name: Check workflows
+    shell: bash
+    run: bash "$GITHUB_ACTION_PATH/run.sh"
