@@ -91,8 +91,8 @@ As decisões completas estão nos ADRs, em [`docs/adrs/`](docs/adrs/).
 
 ## 1.3. Workflow ou action?
 
-- **Reusable workflow**: reaproveita um ou mais jobs inteiros. Roda em runner próprio e é chamado no lugar de um job. Exemplo: o scan de segredos com Gitleaks.
-- **Composite action**: reaproveita uma sequência de steps dentro de um job que já existe. Roda no runner e no workspace do job que a chama. Exemplo: publicar arquivos no S3 e invalidar o cache do CloudFront.
+- **Reusable workflow**: reaproveita um ou mais jobs inteiros. Roda em runner próprio e é chamado no lugar de um job. Os workflows de Gitleaks e semantic-release preparam checkout, permissões e execução.
+- **Composite action**: reaproveita uma sequência de steps dentro de um job que já existe. Roda no runner e no workspace do job que a chama. As actions de Gitleaks e semantic-release executam as ferramentas dentro do job do consumidor.
 
 E os arquivos de configuração? Cada projeto mantém os seus, como o `.github/config/.gitleaks.toml`. Os workflows daqui funcionam sem config quando a ferramenta tem um padrão razoável, então o projeto só commita um arquivo quando quer personalizar. Exemplos opcionais ficam no handbook de cada workflow, em `docs/handbooks/<nome>/`.
 
@@ -156,8 +156,10 @@ Os mesmos princípios valem para o repositório que chama:
 | [`aws-ecr-create`](actions/aws-ecr-create/action.yaml) | Cria um repositório no Amazon ECR se ele ainda não existir | [README](actions/aws-ecr-create/README.md) |
 | [`aws-eks-deploy`](actions/aws-eks-deploy/action.yaml) | Troca a imagem de um deployment no Amazon EKS com `kubectl set image` | [README](actions/aws-eks-deploy/README.md) |
 | [`commitlint-check`](actions/commitlint-check/action.yaml) | Valida mensagens de commit pelo Conventional Commits | [README](actions/commitlint-check/README.md) |
+| [`gitleaks-scan`](actions/gitleaks-scan/action.yaml) | Procura segredos no conteúdo versionado em `HEAD` | [README](actions/gitleaks-scan/README.md) |
 | [`hadolint-check`](actions/hadolint-check/action.yaml) | Valida Dockerfiles rastreados pelo Git | [README](actions/hadolint-check/README.md) |
 | [`kubeconform-validate`](actions/kubeconform-validate/action.yaml) | Valida manifests Kubernetes já renderizados | [README](actions/kubeconform-validate/README.md) |
+| [`semantic-release-run`](actions/semantic-release-run/action.yaml) | Executa semantic-release com configuração e lockfile do consumidor | [README](actions/semantic-release-run/README.md) |
 | [`shellcheck-check`](actions/shellcheck-check/action.yaml) | Analisa scripts Shell rastreados pelo Git | [README](actions/shellcheck-check/README.md) |
 | [`trivy-scan`](actions/trivy-scan/action.yaml) | Procura vulnerabilidades altas e críticas em arquivos ou imagens por digest | [README](actions/trivy-scan/README.md) |
 | [`yamllint-check`](actions/yamllint-check/action.yaml) | Valida YAML com versão e dependências travadas por hash | [README](actions/yamllint-check/README.md) |

@@ -1,0 +1,30 @@
+---
+name: Gitleaks scan
+description: Scan committed HEAD content for secrets with a verified Gitleaks binary
+
+inputs:
+  config:
+    description: Optional workspace-relative Gitleaks config path
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+  - name: Install Gitleaks
+    shell: bash
+    run: |
+      set -euo pipefail
+      if [[ "$RUNNER_OS" != Linux || "$RUNNER_ARCH" != X64 ]]; then
+        echo 'gitleaks-scan supports Linux x64 runners only' >&2
+        exit 1
+      fi
+      bash "$GITHUB_ACTION_PATH/../_lib/install-verified.sh" \
+        'https://github.com/gitleaks/gitleaks/releases/download/v8.23.3/gitleaks_8.23.3_linux_x64.tar.gz' \
+        '73a35edc2285afd689e712b8e0ebad3f2eaf94b0d67cd6e1f0ec693ac751bb4a' \
+        tar.gz gitleaks "$RUNNER_TEMP/tool-actions/gitleaks"
+  - name: Scan committed files
+    shell: bash
+    env:
+      CONFIG: ${{ inputs.config }}
+    run: bash "$GITHUB_ACTION_PATH/run.sh" "$RUNNER_TEMP/tool-actions/gitleaks"
