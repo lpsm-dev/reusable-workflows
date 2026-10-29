@@ -1,0 +1,33 @@
+---
+name: Kubeconform Validate
+description: Validate rendered Kubernetes YAML with a verified Kubeconform release
+
+inputs:
+  target:
+    description: Rendered YAML file or directory inside the caller workspace
+    required: true
+  kubernetes-version:
+    description: Full Kubernetes version used for schema validation, such as 1.29.0
+    required: true
+  schema-path:
+    description: Optional local schema file or directory inside the caller workspace
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+  - name: Install verified Kubeconform
+    shell: bash
+    run: |
+      bash "$GITHUB_ACTION_PATH/../_lib/install-verified.sh" \
+        "https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz" \
+        "9bc2bffbf71f261128533edaf912153948b7ff238f9a531ae6d34466ec287883" \
+        tar.gz kubeconform "$RUNNER_TEMP/tool-actions/kubeconform"
+  - name: Validate manifests
+    shell: bash
+    env:
+      TARGET: ${{ inputs.target }}
+      KUBERNETES_VERSION: ${{ inputs.kubernetes-version }}
+      SCHEMA_PATH: ${{ inputs.schema-path }}
+    run: bash "$GITHUB_ACTION_PATH/check.sh" "$RUNNER_TEMP/tool-actions/kubeconform"

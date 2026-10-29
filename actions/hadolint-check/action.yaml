@@ -1,0 +1,25 @@
+---
+name: Hadolint Check
+description: Check Git-tracked Dockerfiles with a verified Hadolint release
+
+inputs:
+  target:
+    description: Dockerfile or directory inside the caller workspace to check
+    required: false
+    default: .
+
+runs:
+  using: composite
+  steps:
+  - name: Install verified Hadolint
+    shell: bash
+    run: |
+      bash "$GITHUB_ACTION_PATH/../_lib/install-verified.sh" \
+        "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-linux-x86_64" \
+        "c7187db94eeeeca956519a6af171adc31453941a1e777961f6e680f697c8c507" \
+        raw "" "$RUNNER_TEMP/tool-actions/hadolint"
+  - name: Check Dockerfiles
+    shell: bash
+    env:
+      TARGET: ${{ inputs.target }}
+    run: bash "$GITHUB_ACTION_PATH/check.sh" "$RUNNER_TEMP/tool-actions/hadolint"
