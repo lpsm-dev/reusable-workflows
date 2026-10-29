@@ -144,8 +144,8 @@ Os mesmos princípios valem para o repositório que chama:
 
 | Workflow | O que faz | Documentação |
 | --- | --- | --- |
-| [`gitleaks.yaml`](.github/workflows/gitleaks.yaml) | Procura segredos versionados com o Gitleaks. A config é opcional: sem ela, usa as regras padrão | [README](docs/handbooks/gitleaks/handbook-001-gitleaks-workflow.md) |
-| [`semantic-release.yaml`](.github/workflows/semantic-release.yaml) | Cria versões a partir de Conventional Commits com dependências travadas pelo projeto que chama | [README](docs/handbooks/semantic-release/handbook-002-semantic-release-workflow.md) |
+| [`gitleaks.yaml`](.github/workflows/gitleaks.yaml) | Prepara o job e chama `gitleaks-scan`; aceita config opcional | [README](docs/handbooks/gitleaks/handbook-001-gitleaks-workflow.md) |
+| [`semantic-release.yaml`](.github/workflows/semantic-release.yaml) | Prepara o job e chama `semantic-release-run` com o lockfile do consumidor | [README](docs/handbooks/semantic-release/handbook-002-semantic-release-workflow.md) |
 
 ## 3.2. Composite actions
 

@@ -51,7 +51,7 @@ This action is a `composite` action.
 
 ## 1. Exemplo de job
 
-Crie `package.json`, `package-lock.json` e `.releaserc.json` em `.github/config/release/` no projeto consumidor. Troque `<sha-completo>` pelo SHA de 40 caracteres de uma versão publicada deste repositório.
+Crie `package.json`, `package-lock.json` e `.releaserc.json` em `.github/config/release/` no projeto consumidor. O exemplo fixa o SHA completo de uma versão publicada deste repositório.
 
 ```yaml
 name: Release
@@ -75,7 +75,7 @@ jobs:
       with:
         fetch-depth: 0
         persist-credentials: false
-    - uses: lpsm-dev/reusable-workflows/actions/semantic-release-run@<sha-completo>
+    - uses: lpsm-dev/reusable-workflows/actions/semantic-release-run@448df7be7d80aafadc6e0db77bc577c031cd0bca
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```

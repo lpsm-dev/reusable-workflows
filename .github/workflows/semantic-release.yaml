@@ -38,33 +38,11 @@ jobs:
       with:
         fetch-depth: 0
         persist-credentials: false
-    - name: Setup Node.js
-      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
-      with:
-        node-version: "24.22.0"
     - name: Release
-      shell: bash
+      uses: lpsm-dev/reusable-workflows/actions/semantic-release-run@448df7be7d80aafadc6e0db77bc577c031cd0bca
+      with:
+        release-directory: ${{ inputs.release-directory }}
+        release-branch: ${{ inputs.release-branch }}
+        dry-run: ${{ inputs.dry-run }}
       env:
-        RELEASE_DIRECTORY: ${{ inputs.release-directory }}
-        DRY_RUN: ${{ inputs.dry-run }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -euo pipefail
-        directory="$(realpath -m "${GITHUB_WORKSPACE}/${RELEASE_DIRECTORY}")"
-        case "$directory" in
-          "${GITHUB_WORKSPACE}"/*) ;;
-          *) echo "release-directory must be inside GITHUB_WORKSPACE" >&2; exit 1 ;;
-        esac
-        for file in package.json package-lock.json .releaserc.json; do
-          if [[ ! -f "${directory}/${file}" ]]; then
-            echo "Missing release configuration: ${file}" >&2
-            exit 1
-          fi
-        done
-        cd "$directory"
-        npm ci --ignore-scripts --no-audit --no-fund
-        args=()
-        if [[ "$DRY_RUN" == true ]]; then
-          args+=(--dry-run)
-        fi
-        ./node_modules/.bin/semantic-release "${args[@]}"
