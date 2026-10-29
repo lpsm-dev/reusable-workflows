@@ -1,0 +1,70 @@
+---
+name: Semantic Release
+
+on:
+  workflow_call:
+    inputs:
+      release-directory:
+        description: Directory with package.json, package-lock.json and .releaserc.json
+        required: false
+        type: string
+        default: .github/config/release
+      release-branch:
+        description: Branch permitted to create tags and GitHub releases
+        required: false
+        type: string
+        default: main
+      dry-run:
+        description: Analyze and verify a release without publishing it
+        required: false
+        type: boolean
+        default: false
+
+permissions: {}
+
+jobs:
+  release:
+    name: Release
+    if: ${{ github.ref == format('refs/heads/{0}', inputs.release-branch) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - name: Setup Node.js
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+      with:
+        node-version: "24.22.0"
+    - name: Release
+      shell: bash
+      env:
+        RELEASE_DIRECTORY: ${{ inputs.release-directory }}
+        DRY_RUN: ${{ inputs.dry-run }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        set -euo pipefail
+        directory="$(realpath -m "${GITHUB_WORKSPACE}/${RELEASE_DIRECTORY}")"
+        case "$directory" in
+          "${GITHUB_WORKSPACE}"/*) ;;
+          *) echo "release-directory must be inside GITHUB_WORKSPACE" >&2; exit 1 ;;
+        esac
+        for file in package.json package-lock.json .releaserc.json; do
+          if [[ ! -f "${directory}/${file}" ]]; then
+            echo "Missing release configuration: ${file}" >&2
+            exit 1
+          fi
+        done
+        cd "$directory"
+        npm ci --ignore-scripts --no-audit --no-fund
+        args=()
+        if [[ "$DRY_RUN" == true ]]; then
+          args+=(--dry-run)
+        fi
+        ./node_modules/.bin/semantic-release "${args[@]}"

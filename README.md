@@ -64,6 +64,7 @@ Toda peça daqui segue o [OWASP Top 10 CI/CD Security Risks](https://owasp.org/p
 │   ├── taskfiles/           # tasks incluídas pelo Taskfile.yaml
 │   └── workflows/
 │       ├── gitleaks.yaml    # reusable workflow público
+│       ├── semantic-release.yaml # reusable workflow público
 │       └── _*.yaml          # CI e release deste repositório
 ├── actions/
 │   └── <nome>/              # composite action: action.yaml + README.md
@@ -144,6 +145,7 @@ Os mesmos princípios valem para o repositório que chama:
 | Workflow | O que faz | Documentação |
 | --- | --- | --- |
 | [`gitleaks.yaml`](.github/workflows/gitleaks.yaml) | Procura segredos versionados com o Gitleaks. A config é opcional: sem ela, usa as regras padrão | [README](docs/handbooks/gitleaks/handbook-001-gitleaks-workflow.md) |
+| [`semantic-release.yaml`](.github/workflows/semantic-release.yaml) | Cria versões a partir de Conventional Commits com dependências travadas pelo projeto que chama | [README](docs/handbooks/semantic-release/handbook-002-semantic-release-workflow.md) |
 
 ## 3.2. Composite actions
 
@@ -153,6 +155,7 @@ Os mesmos princípios valem para o repositório que chama:
 | [`aws-cloudfront-deploy`](actions/aws-cloudfront-deploy/action.yaml) | Sincroniza uma pasta com um bucket S3 e invalida o cache da distribuição CloudFront | [README](actions/aws-cloudfront-deploy/README.md) |
 | [`aws-ecr-create`](actions/aws-ecr-create/action.yaml) | Cria um repositório no Amazon ECR se ele ainda não existir | [README](actions/aws-ecr-create/README.md) |
 | [`aws-eks-deploy`](actions/aws-eks-deploy/action.yaml) | Troca a imagem de um deployment no Amazon EKS com `kubectl set image` | [README](actions/aws-eks-deploy/README.md) |
+| [`commitlint-check`](actions/commitlint-check/action.yaml) | Valida mensagens de commit pelo Conventional Commits | [README](actions/commitlint-check/README.md) |
 | [`hadolint-check`](actions/hadolint-check/action.yaml) | Valida Dockerfiles rastreados pelo Git | [README](actions/hadolint-check/README.md) |
 | [`kubeconform-validate`](actions/kubeconform-validate/action.yaml) | Valida manifests Kubernetes já renderizados | [README](actions/kubeconform-validate/README.md) |
 | [`shellcheck-check`](actions/shellcheck-check/action.yaml) | Analisa scripts Shell rastreados pelo Git | [README](actions/shellcheck-check/README.md) |
