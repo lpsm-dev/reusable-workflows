@@ -1,0 +1,25 @@
+---
+name: ShellCheck Check
+description: Check Git-tracked Shell scripts with a verified ShellCheck release
+
+inputs:
+  target:
+    description: File or directory inside the caller workspace to check
+    required: false
+    default: .
+
+runs:
+  using: composite
+  steps:
+  - name: Install verified ShellCheck
+    shell: bash
+    run: |
+      bash "$GITHUB_ACTION_PATH/../_lib/install-verified.sh" \
+        "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.gz" \
+        "b7af85e41cc99489dcc21d66c6d5f3685138f06d34651e6d34b42ec6d54fe6f6" \
+        tar.gz "shellcheck-v0.11.0/shellcheck" "$RUNNER_TEMP/tool-actions/shellcheck"
+  - name: Check Shell scripts
+    shell: bash
+    env:
+      TARGET: ${{ inputs.target }}
+    run: bash "$GITHUB_ACTION_PATH/check.sh" "$RUNNER_TEMP/tool-actions/shellcheck"

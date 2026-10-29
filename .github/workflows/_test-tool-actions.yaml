@@ -1,0 +1,64 @@
+---
+name: Tool Actions
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: tool-actions-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  behavior:
+    name: Behavior Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      with:
+        persist-credentials: false
+    - name: Test action behavior and verified downloads
+      run: |
+        set -euo pipefail
+        bash .github/tests/tool-actions-stage1.sh
+        python3 -m unittest discover -s .github/tests/tool-actions -p 'test_*.py'
+        bash .github/tests/trivy-scan.sh
+
+  smoke:
+    name: Tool Smoke Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      with:
+        persist-credentials: false
+    - name: Check Shell fixture
+      uses: ./actions/shellcheck-check  # zizmor: ignore[self-repository]
+      with:
+        target: .github/tests/fixtures/tool-actions/good.sh
+    - name: Check Dockerfile fixture
+      uses: ./actions/hadolint-check  # zizmor: ignore[self-repository]
+      with:
+        target: .github/tests/fixtures/tool-actions/Dockerfile
+    - name: Validate Kubernetes fixture
+      uses: ./actions/kubeconform-validate  # zizmor: ignore[self-repository]
+      with:
+        target: .github/tests/fixtures/tool-actions/pod.yaml
+        kubernetes-version: 1.29.0
+        schema-path: .github/tests/fixtures/tool-actions/pod-v1.json
+    - name: Scan dependency fixture
+      uses: ./actions/trivy-scan  # zizmor: ignore[self-repository]
+      with:
+        scan-type: fs
+        target: .github/tests/fixtures/tool-actions

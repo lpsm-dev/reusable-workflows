@@ -1,0 +1,26 @@
+---
+name: Yamllint check
+description: Validate YAML files with a pinned, hash-locked yamllint environment
+
+inputs:
+  target:
+    description: File or directory to validate, relative to the caller workspace
+    required: false
+    default: .
+  config:
+    description: Optional yamllint configuration, relative to the caller workspace
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+  - name: Install yamllint
+    shell: bash
+    run: bash "$GITHUB_ACTION_PATH/install.sh"
+  - name: Check YAML
+    shell: bash
+    env:
+      INPUT_TARGET: ${{ inputs.target }}
+      INPUT_CONFIG: ${{ inputs.config }}
+    run: bash "$GITHUB_ACTION_PATH/run.sh"
