@@ -30,7 +30,7 @@ permissions: {}
 
 jobs:
   release:
-    uses: lpsm-dev/reusable-workflows/.github/workflows/semantic-release.yaml@44b9f3732d9b0b99bdf9cb0f0be97c89e250b0c5
+    uses: lpsm-dev/reusable-workflows/.github/workflows/semantic-release.yaml@56f5dbe1a8091b2c2dea19516375689aa9d0f017
     permissions:
       contents: write
       issues: write
