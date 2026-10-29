@@ -36,9 +36,16 @@ Cada action tem uma pasta com o `action.yaml` e um `README.md`. O README é gera
 
 | Action | O que faz |
 | --- | --- |
+| [`actionlint-check`](actionlint-check/README.md) | Valida workflows do GitHub Actions e os scripts Shell embutidos |
 | [`aws-cloudfront-deploy`](aws-cloudfront-deploy/README.md) | Sincroniza uma pasta com um bucket S3 e invalida o cache da distribuição CloudFront que usa esse bucket como origem |
 | [`aws-ecr-create`](aws-ecr-create/README.md) | Cria um repositório no Amazon ECR se ele ainda não existir |
 | [`aws-eks-deploy`](aws-eks-deploy/README.md) | Troca a imagem de um deployment no Amazon EKS com `kubectl set image`, usando uma imagem do ECR |
+| [`hadolint-check`](hadolint-check/README.md) | Valida Dockerfiles rastreados pelo Git |
+| [`kubeconform-validate`](kubeconform-validate/README.md) | Valida manifests Kubernetes já renderizados |
+| [`shellcheck-check`](shellcheck-check/README.md) | Analisa scripts Shell rastreados pelo Git |
+| [`trivy-scan`](trivy-scan/README.md) | Procura vulnerabilidades altas e críticas em arquivos ou imagens por digest |
+| [`yamllint-check`](yamllint-check/README.md) | Valida YAML com versão e dependências travadas por hash |
+| [`zizmor-audit`](zizmor-audit/README.md) | Audita workflows e actions do GitHub em modo offline |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

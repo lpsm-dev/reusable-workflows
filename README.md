@@ -113,7 +113,7 @@ Um workflow compartilhado roda no pipeline de todo repositório que o chama, com
 | [CICD-SEC-6: Insufficient Credential Hygiene](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-06-Insufficient-Credential-Hygiene) | Todo checkout usa `persist-credentials: false`, o Gitleaks mascara o segredo com `--redact`, e todo push e pull request deste repositório passa pelo scan de segredos. |
 | [CICD-SEC-7: Insecure System Configuration](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-07-Insecure-System-Configuration) | Os jobs rodam em runners hospedados pelo GitHub, descartados ao fim de cada execução, e todos têm `timeout-minutes`. |
 | [CICD-SEC-8: Ungoverned Usage of 3rd Party Services](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-08-Ungoverned-Usage-of-3rd-Party-Services) | Os workflows não mandam código nem token para serviços externos: o Gitleaks roda no runner e o resultado fica no log. Apps instalados no repositório, como o CodeRabbit, têm acesso por fora do pipeline e precisam ser revisados nas configurações do repositório, em GitHub Apps. |
-| [CICD-SEC-9: Improper Artifact Integrity Validation](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-09-Improper-Artifact-Integrity-Validation) | Os binários do Gitleaks e do actionlint só são instalados se o SHA256 bater com o valor fixado no workflow. |
+| [CICD-SEC-9: Improper Artifact Integrity Validation](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-09-Improper-Artifact-Integrity-Validation) | Os binários das actions de ferramentas e do workflow de Gitleaks só são instalados se o SHA256 bater com o valor fixado. As dependências Python do yamllint também são travadas por hash. |
 | [CICD-SEC-10: Insufficient Logging and Visibility](https://owasp.org/www-project-top-10-ci-cd-security-risks/CICD-SEC-10-Insufficient-Logging-And-Visibility) | Nenhuma verificação usa `continue-on-error`: uma falha aparece no log e derruba o job. O step `Scan` do Gitleaks registra qual config usou. |
 
 ## 2.2. Pendências conhecidas
@@ -123,7 +123,7 @@ O que ainda não segue a tabela acima:
 - O ruleset exige pull request e CI verde, mas não aprovação de outra pessoa, porque não há um segundo revisor (CICD-SEC-1).
 - O repositório exige SHA completo em toda action (`sha_pinning_required`), mas a lista de actions permitidas continua aberta (`allowed_actions: all`): qualquer action fixada por SHA pode rodar (CICD-SEC-8).
 - O semantic-release está fixado na 23.0.0, e o `npm audit` aponta vulnerabilidades em dependências transitivas dessa versão. A atualização chega pelo pull request do Dependabot (CICD-SEC-3).
-- As composite actions não têm teste automatizado. Exercitá-las exige uma conta AWS e uma role OIDC de teste.
+- As composite actions de AWS ainda não têm teste automatizado. Exercitá-las exige uma conta AWS e uma role OIDC de teste.
 
 ## 2.3. No seu pipeline
 
@@ -149,9 +149,16 @@ Os mesmos princípios valem para o repositório que chama:
 
 | Action | O que faz | Documentação |
 | --- | --- | --- |
+| [`actionlint-check`](actions/actionlint-check/action.yaml) | Valida workflows do GitHub Actions e os scripts Shell embutidos | [README](actions/actionlint-check/README.md) |
 | [`aws-cloudfront-deploy`](actions/aws-cloudfront-deploy/action.yaml) | Sincroniza uma pasta com um bucket S3 e invalida o cache da distribuição CloudFront | [README](actions/aws-cloudfront-deploy/README.md) |
 | [`aws-ecr-create`](actions/aws-ecr-create/action.yaml) | Cria um repositório no Amazon ECR se ele ainda não existir | [README](actions/aws-ecr-create/README.md) |
 | [`aws-eks-deploy`](actions/aws-eks-deploy/action.yaml) | Troca a imagem de um deployment no Amazon EKS com `kubectl set image` | [README](actions/aws-eks-deploy/README.md) |
+| [`hadolint-check`](actions/hadolint-check/action.yaml) | Valida Dockerfiles rastreados pelo Git | [README](actions/hadolint-check/README.md) |
+| [`kubeconform-validate`](actions/kubeconform-validate/action.yaml) | Valida manifests Kubernetes já renderizados | [README](actions/kubeconform-validate/README.md) |
+| [`shellcheck-check`](actions/shellcheck-check/action.yaml) | Analisa scripts Shell rastreados pelo Git | [README](actions/shellcheck-check/README.md) |
+| [`trivy-scan`](actions/trivy-scan/action.yaml) | Procura vulnerabilidades altas e críticas em arquivos ou imagens por digest | [README](actions/trivy-scan/README.md) |
+| [`yamllint-check`](actions/yamllint-check/action.yaml) | Valida YAML com versão e dependências travadas por hash | [README](actions/yamllint-check/README.md) |
+| [`zizmor-audit`](actions/zizmor-audit/action.yaml) | Audita workflows e actions do GitHub em modo offline | [README](actions/zizmor-audit/README.md) |
 
 Pré-requisitos de credenciais e observações de cada action estão no [catálogo de actions](actions/README.md).
 

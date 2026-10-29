@@ -2,6 +2,15 @@
 
 [◀ Voltar](../README.md)
 
+Após o checkout, valide o YAML com a configuração do projeto:
+
+```yaml
+- uses: lpsm-dev/reusable-workflows/actions/yamllint-check@274e31d0995a09c08e9362b6aa7e7dd4d28fbd6e
+  with:
+    target: .
+    config: .github/config/.yamllint.yaml
+```
+
 <!-- action-docs-all source="action.yaml" project="lpsm-dev/reusable-workflows/actions/yamllint-check" version="<sha-completo>" -->
 # Yamllint check
 

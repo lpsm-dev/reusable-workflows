@@ -2,6 +2,14 @@
 
 [◀ Voltar](../README.md)
 
+Após o checkout, valide os scripts Shell rastreados pelo Git:
+
+```yaml
+- uses: lpsm-dev/reusable-workflows/actions/shellcheck-check@274e31d0995a09c08e9362b6aa7e7dd4d28fbd6e
+  with:
+    target: .
+```
+
 <!-- action-docs-all source="action.yaml" project="lpsm-dev/reusable-workflows/actions/shellcheck-check" version="<sha-completo>" -->
 # ShellCheck Check
 
