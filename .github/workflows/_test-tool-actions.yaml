@@ -43,6 +43,13 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       with:
         persist-credentials: false
+    - name: Create commit fixture
+      run: |
+        git config user.name "CI Fixture"
+        git config user.email "ci-fixture@example.invalid"
+        git commit --allow-empty -m "feat: check commit messages"
+    - name: Check commit fixture
+      uses: ./actions/commitlint-check  # zizmor: ignore[self-repository]
     - name: Check Shell fixture
       uses: ./actions/shellcheck-check  # zizmor: ignore[self-repository]
       with:
