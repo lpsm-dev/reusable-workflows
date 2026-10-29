@@ -1,0 +1,30 @@
+---
+name: Commitlint check
+description: Validate Conventional Commits with a locked commitlint toolchain
+
+inputs:
+  base-sha:
+    description: Optional first commit (excluded) for range validation
+    required: false
+    default: ""
+  head-sha:
+    description: Optional last commit (included) for range validation
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+  - name: Setup Node.js
+    uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+    with:
+      node-version: "24.22.0"
+  - name: Install commitlint
+    shell: bash
+    run: bash "$GITHUB_ACTION_PATH/install.sh"
+  - name: Check commit messages
+    shell: bash
+    env:
+      INPUT_BASE_SHA: ${{ inputs.base-sha }}
+      INPUT_HEAD_SHA: ${{ inputs.head-sha }}
+    run: bash "$GITHUB_ACTION_PATH/run.sh"
