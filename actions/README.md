@@ -40,6 +40,7 @@ Cada action tem uma pasta com o `action.yaml` e um `README.md`. O README é gera
 | [`aws-cloudfront-deploy`](aws-cloudfront-deploy/README.md) | Sincroniza uma pasta com um bucket S3 e invalida o cache da distribuição CloudFront que usa esse bucket como origem |
 | [`aws-ecr-create`](aws-ecr-create/README.md) | Cria um repositório no Amazon ECR se ele ainda não existir |
 | [`aws-eks-deploy`](aws-eks-deploy/README.md) | Troca a imagem de um deployment no Amazon EKS com `kubectl set image`, usando uma imagem do ECR |
+| [`commitlint-check`](commitlint-check/README.md) | Valida mensagens de commit pelo Conventional Commits |
 | [`hadolint-check`](hadolint-check/README.md) | Valida Dockerfiles rastreados pelo Git |
 | [`kubeconform-validate`](kubeconform-validate/README.md) | Valida manifests Kubernetes já renderizados |
 | [`shellcheck-check`](shellcheck-check/README.md) | Analisa scripts Shell rastreados pelo Git |
