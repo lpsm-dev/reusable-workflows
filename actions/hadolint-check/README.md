@@ -5,7 +5,7 @@
 Após o checkout, valide os Dockerfiles rastreados pelo Git:
 
 ```yaml
-- uses: lpsm-dev/reusable-workflows/actions/hadolint-check@274e31d0995a09c08e9362b6aa7e7dd4d28fbd6e
+- uses: lpsm-dev/reusable-workflows/actions/hadolint-check@56f5dbe1a8091b2c2dea19516375689aa9d0f017
   with:
     target: .
 ```

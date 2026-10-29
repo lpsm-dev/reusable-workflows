@@ -7,7 +7,7 @@ Esta action procura vulnerabilidades em uma pasta ou em uma imagem fixada por di
 Após o checkout, analise os arquivos do repositório:
 
 ```yaml
-- uses: lpsm-dev/reusable-workflows/actions/trivy-scan@274e31d0995a09c08e9362b6aa7e7dd4d28fbd6e
+- uses: lpsm-dev/reusable-workflows/actions/trivy-scan@56f5dbe1a8091b2c2dea19516375689aa9d0f017
   with:
     scan-type: fs
     target: .

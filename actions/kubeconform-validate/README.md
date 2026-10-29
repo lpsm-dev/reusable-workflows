@@ -5,7 +5,7 @@
 Após o checkout e a renderização dos manifests, valide os arquivos gerados:
 
 ```yaml
-- uses: lpsm-dev/reusable-workflows/actions/kubeconform-validate@274e31d0995a09c08e9362b6aa7e7dd4d28fbd6e
+- uses: lpsm-dev/reusable-workflows/actions/kubeconform-validate@56f5dbe1a8091b2c2dea19516375689aa9d0f017
   with:
     target: manifests/rendered
     kubernetes-version: 1.29.0
