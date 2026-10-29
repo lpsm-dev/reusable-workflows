@@ -1,0 +1,38 @@
+---
+name: Trivy scan
+description: Scan a filesystem path or digest-pinned image for high and critical vulnerabilities
+
+inputs:
+  scan-type:
+    description: Scan target type, fs or image
+    required: true
+  target:
+    description: Workspace-relative path for fs or digest-pinned image reference for image
+    required: true
+  ignorefile:
+    description: Optional workspace-relative Trivy ignore file
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+  - name: Install Trivy
+    shell: bash
+    run: |
+      set -euo pipefail
+      if [[ "$RUNNER_OS" != Linux || "$RUNNER_ARCH" != X64 ]]; then
+        echo 'trivy-scan supports Linux x64 runners only' >&2
+        exit 1
+      fi
+      bash "$GITHUB_ACTION_PATH/../_lib/install-verified.sh" \
+        'https://github.com/aquasecurity/trivy/releases/download/v0.76.1/trivy_0.76.1_Linux-64bit.tar.gz' \
+        'c7cbe3137fb8a48a17574bede3dd6beb16742d1e9772929940fc90082c39d9c0' \
+        tar.gz trivy "$RUNNER_TEMP/tool-actions/trivy"
+  - name: Scan vulnerabilities
+    shell: bash
+    env:
+      SCAN_TYPE: ${{ inputs.scan-type }}
+      TARGET: ${{ inputs.target }}
+      IGNORE_FILE: ${{ inputs.ignorefile }}
+    run: bash "$GITHUB_ACTION_PATH/run.sh" "$RUNNER_TEMP/tool-actions/trivy"
