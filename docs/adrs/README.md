@@ -21,3 +21,4 @@ Pesquisa fica em `docs/research/`. Proposta ainda sem decisão fica em `docs/rfc
 | [adr-004-remove-templates.md](adr-004-remove-templates.md) | Sem pasta `templates/`, o padrão fica dentro do workflow | accepted, local da página substituído pelo 006 |
 | [adr-005-adopt-community-practices.md](adr-005-adopt-community-practices.md) | Práticas adotadas depois da pesquisa 001 | accepted |
 | [adr-006-docs-taxonomy.md](adr-006-docs-taxonomy.md) | `docs/` organizado por tipo de documento | accepted |
+| [adr-007-tool-actions-and-workflow-wrappers.md](adr-007-tool-actions-and-workflow-wrappers.md) | Gitleaks e semantic-release como actions com workflows de compatibilidade | accepted |

@@ -50,6 +50,8 @@ jobs:
         git commit --allow-empty -m "feat: check commit messages"
     - name: Check commit fixture
       uses: ./actions/commitlint-check  # zizmor: ignore[self-repository]
+    - name: Scan committed content
+      uses: ./actions/gitleaks-scan  # zizmor: ignore[self-repository]
     - name: Check Shell fixture
       uses: ./actions/shellcheck-check  # zizmor: ignore[self-repository]
       with:
@@ -69,3 +71,25 @@ jobs:
       with:
         scan-type: fs
         target: .github/tests/fixtures/tool-actions
+
+  release-smoke:
+    name: Semantic Release Dry Run
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - name: Verify release configuration
+      uses: ./actions/semantic-release-run  # zizmor: ignore[self-repository]
+      with:
+        dry-run: 'true'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

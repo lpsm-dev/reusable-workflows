@@ -1,0 +1,32 @@
+---
+name: Semantic Release run
+description: Run semantic-release from the caller's locked configuration
+
+inputs:
+  release-directory:
+    description: Workspace-relative directory with package.json, package-lock.json and .releaserc.json
+    required: false
+    default: .github/config/release
+  release-branch:
+    description: Branch permitted to publish a release
+    required: false
+    default: main
+  dry-run:
+    description: Analyze and verify a release without publishing it
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+  - name: Setup Node.js
+    uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+    with:
+      node-version: "24.22.0"
+  - name: Run semantic-release
+    shell: bash
+    env:
+      RELEASE_DIRECTORY: ${{ inputs.release-directory }}
+      RELEASE_BRANCH: ${{ inputs.release-branch }}
+      DRY_RUN: ${{ inputs.dry-run }}
+    run: bash "$GITHUB_ACTION_PATH/run.sh"

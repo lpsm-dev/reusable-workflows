@@ -41,8 +41,10 @@ Cada action tem uma pasta com o `action.yaml` e um `README.md`. O README é gera
 | [`aws-ecr-create`](aws-ecr-create/README.md) | Cria um repositório no Amazon ECR se ele ainda não existir |
 | [`aws-eks-deploy`](aws-eks-deploy/README.md) | Troca a imagem de um deployment no Amazon EKS com `kubectl set image`, usando uma imagem do ECR |
 | [`commitlint-check`](commitlint-check/README.md) | Valida mensagens de commit pelo Conventional Commits |
+| [`gitleaks-scan`](gitleaks-scan/README.md) | Procura segredos no conteúdo versionado em `HEAD` |
 | [`hadolint-check`](hadolint-check/README.md) | Valida Dockerfiles rastreados pelo Git |
 | [`kubeconform-validate`](kubeconform-validate/README.md) | Valida manifests Kubernetes já renderizados |
+| [`semantic-release-run`](semantic-release-run/README.md) | Executa semantic-release com configuração e lockfile do consumidor |
 | [`shellcheck-check`](shellcheck-check/README.md) | Analisa scripts Shell rastreados pelo Git |
 | [`trivy-scan`](trivy-scan/README.md) | Procura vulnerabilidades altas e críticas em arquivos ou imagens por digest |
 | [`yamllint-check`](yamllint-check/README.md) | Valida YAML com versão e dependências travadas por hash |
@@ -68,6 +70,8 @@ steps:
 
 ## 3.2. Observações
 
+- `gitleaks-scan` precisa de checkout do repositório antes do step. Examina somente os arquivos versionados em `HEAD`, com conteúdo sensível mascarado no log.
+- `semantic-release-run` precisa de checkout com `fetch-depth: 0`, configuração com lockfile no projeto consumidor e `GITHUB_TOKEN` no ambiente do step. O job de publicação precisa das permissões `contents: write`, `issues: write` e `pull-requests: write`.
 - O `aws-eks-deploy` monta a imagem como `<registry do ECR>/<image-name>:<image-tag>` e atualiza o container que tem o mesmo nome do deployment (`app-name`). Se o container tiver outro nome, o `kubectl set image` falha.
 - O `aws-cloudfront-deploy` escolhe a primeira distribuição cuja primeira origem contém `<s3-bucket-name>.<s3-bucket-domain>` e invalida `/*` nela. O step espera a invalidação terminar.
 - As actions de terceiros usadas aqui são fixadas por SHA, e os inputs chegam aos scripts por `env:`, como pede o [checklist de segurança](../CONTRIBUTING.md#4-segurança).
