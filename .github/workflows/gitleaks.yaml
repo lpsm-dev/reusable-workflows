@@ -35,6 +35,6 @@ jobs:
         persist-credentials: false
         fetch-depth: 0
     - name: Scan
-      uses: lpsm-dev/reusable-workflows/actions/gitleaks-scan@448df7be7d80aafadc6e0db77bc577c031cd0bca
+      uses: lpsm-dev/reusable-workflows/actions/gitleaks-scan@1df18b0a7a4114dd2cd3f2473b3e448513fc5ddd
       with:
         config: ${{ inputs.config }}
