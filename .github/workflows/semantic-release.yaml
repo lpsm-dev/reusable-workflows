@@ -39,7 +39,7 @@ jobs:
         fetch-depth: 0
         persist-credentials: false
     - name: Release
-      uses: lpsm-dev/reusable-workflows/actions/semantic-release-run@448df7be7d80aafadc6e0db77bc577c031cd0bca
+      uses: lpsm-dev/reusable-workflows/actions/semantic-release-run@1df18b0a7a4114dd2cd3f2473b3e448513fc5ddd
       with:
         release-directory: ${{ inputs.release-directory }}
         release-branch: ${{ inputs.release-branch }}
